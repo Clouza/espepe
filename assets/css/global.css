@@ -1,0 +1,26 @@
+* {
+    --black: #11101D;
+}
+
+.flash-message {
+    position: absolute;
+    padding: 5px 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 40px;
+    background-color: var(--black);
+    color: white;
+    z-index: 1999;
+    animation-name: fadein;
+    animation-duration: 1s;
+}
+
+@keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
