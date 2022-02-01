@@ -6,6 +6,20 @@ use PDO;
 use mysqli;
 use Exception;
 
+// ajax handler
+if (isset($_POST['func'])) {
+    $functionRequest = $_POST['func'];
+    switch ($functionRequest) {
+        case 'getDetailSiswaByNis':
+            $nisn = $_POST['ns'];
+            Database::getDetailSiswaByNis($nisn);
+            break;
+        default:
+            # code...
+            break;
+    }
+}
+
 class Database
 {
     private $servername = 'localhost';
@@ -76,7 +90,7 @@ class Database
     // will be active when have learned PDO
     // public function insert($data = [])
     // {
-    //     // print_r(PDO::getAvailableDrivers());
+    //     print_r(PDO::getAvailableDrivers());
     //     foreach ($data as $d) {
     //         $insert = "INSERT INTO $this->table VALUES ($d)";
     //     }
@@ -143,5 +157,19 @@ class Database
             die;
         }
         return $result;
+    }
+
+    // ajax handler
+    public static function getDetailSiswaByNis($nisn)
+    {
+        $db = new Database;
+        // $result = $db->table('siswa')->where('nis', '=', $nis)->get()->fetch_assoc();
+        $result = $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas')->where('nisn', '=', $nisn)->get()->fetch_assoc();
+
+        echo 'NIS: ' . $result['nis'] . '<br>';
+        echo 'NAMA: ' . $result['nama'] . '<br>';
+        echo 'NO TELP: ' . $result['no_telp'] . '<br>';
+        echo 'KELAS: ' . $result['nama_kelas'] . '<br>';
+        echo 'KOMPETENSI: ' . $result['kompetensi_keahlian'] . '<br>';
     }
 }

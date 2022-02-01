@@ -48,6 +48,7 @@ reqFile('../templates/sidebar.php');
                         <option value="<?= $s['nisn']; ?>"><?= $s['nis']; ?></option>
                     <?php endforeach; ?>
                 </select>
+                <div class="information" id="information"></div>
             </div>
 
             <div class="form-group">
