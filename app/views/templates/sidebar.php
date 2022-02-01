@@ -9,7 +9,7 @@ if (isset($_POST['logout'])) {
 ?>
 
 <body>
-    <div class="sidebar">
+    <div class="sidebar open">
         <div class="logo-details">
             <div class="logo-name">PBW</div>
             <i class='bx bx-menu' id="btn"></i>
@@ -22,9 +22,19 @@ if (isset($_POST['logout'])) {
                 <input type="text" placeholder="Search...">
                 <span class="tooltip">Search</span>
             </li> -->
-            <?php if (Session::get('level') == 1) : ?>
+            <?php if (Session::get('level') == 2) : ?>
                 <li>
-                    <a href="../petugas/index.php" class="<?= (currentApp() == 'petugas/index' || currentApp() == 'petugas/addPetugas' ? 'active' : '') ?>">
+                    <a href="../kelas/index.php" class="<?= (currentApp() == 'kelas/index' || currentApp() == 'kelas/addKelas' || currentApp() == 'kelas/updateKelas' ? 'active' : '') ?>">
+                        <i class='bx bxs-book'></i>
+                        <span class="links-name">Kelas</span>
+                    </a>
+                    <span class="tooltip">Kelas</span>
+                </li>
+            <?php endif; ?>
+
+            <?php if (Session::get('level') == 2) : ?>
+                <li>
+                    <a href="../petugas/index.php" class="<?= (currentApp() == 'petugas/index' || currentApp() == 'petugas/addPetugas' || currentApp() == 'petugas/updatePetugas' ? 'active' : '') ?>">
                         <i class='bx bx-user'></i>
                         <span class="links-name">Petugas</span>
                     </a>

@@ -28,10 +28,13 @@ reqFile('../templates/sidebar.php');
 <section class="home-section">
     <div class="text">History Pembayaran</div>
     <div class="container">
-        <form action="" method="post">
-            <input type="text" placeholder="Cari NIS" name="nis">
-            <button type="submit" name="cariNIS">Cari</button>
-        </form>
+        <?php if (Session::has('level')) : ?>
+            <form action="" method="post">
+                <input type="text" placeholder="Cari NIS" name="nis">
+                <button type="submit" name="cariNIS">Cari</button>
+                <button onclick="window.print()">Cetak</button>
+            </form>
+        <?php endif; ?>
         <table>
             <tr>
                 <th>Petugas</th>

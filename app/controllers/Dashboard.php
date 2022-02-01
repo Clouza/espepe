@@ -40,11 +40,10 @@ class Dashboard
         $db = new Database;
         try {
             $siswa = $db->table('siswa')->where('nis', '=', $nis)->get()->fetch_assoc();
-
-            if (!is_null($siswa)) {
-                return (int)$siswa['nisn'];
+            if (is_null($siswa)) {
+                throw new Exception("Siswa tidak ada", 404);
             }
-            throw new Exception("Siswa tidak ada", 404);
+            return (int)$siswa['nisn'];
         } catch (Exception $e) {
             return $e->getMessage();
         }
@@ -59,27 +58,65 @@ class Dashboard
         return $join;
     }
 
+    public static function readPetugasById($idpetugas)
+    {
+        $db = new Database;
+        return $db->table('petugas')->where('id_petugas', '=', $idpetugas)->get()->fetch_assoc();
+    }
+
     public static function addPetugas($idpetugas, $username, $password, $nama, $otorisasi)
     {
         $db = new Database;
         $petugas = $db->table('petugas')->addPetugas($idpetugas, $username, $password, $nama, $otorisasi);
-
-        if ($petugas) { //true
-            Flasher::set('Petugas ditambahkan!');
-        }
+    }
+    public static function updatePetugas($idpetugas, $username, $nama, $otorisasi)
+    {
+        $db = new Database;
+        $petugas = $db->table('petugas')->updatePetugas($idpetugas, $username, $nama, $otorisasi);
+        return Flasher::set('Petugas diubah!');
     }
 
     public static function deletePetugas($idpetugas)
     {
         $db = new Database;
-        $db->table('petugas')->deletePetugas($idpetugas);
-
-        return refresh();
+        return $db->table('petugas')->deletePetugas($idpetugas);
     }
 
     public static function getRole()
     {
         $db = new Database;
         return $db->table('otorisasi')->get();
+    }
+
+    // ================================== Kelas
+    public static function readKelas()
+    {
+        $db = new Database;
+        return $db->table('kelas')->get();
+    }
+
+    public static function readKelasById($idkelas)
+    {
+        $db = new Database;
+        return $db->table('kelas')->where('id_kelas', '=', $idkelas)->get()->fetch_assoc();
+    }
+
+    public static function addKelas($nama, $kompetensi)
+    {
+        $db = new Database;
+        $kelas = $db->table('kelas')->addKelas($nama, $kompetensi);
+    }
+
+    public static function updateKelas($idkelas, $nama, $kompetensi)
+    {
+        $db = new Database;
+        $kelas = $db->table('kelas')->updateKelas($idkelas, $nama, $kompetensi);
+        return Flasher::set('Kelas diubah!');
+    }
+
+    public static function deleteKelas($idkelas)
+    {
+        $db = new Database;
+        return $db->table('kelas')->deleteKelas($idkelas);
     }
 }

@@ -33,7 +33,6 @@ reqFile('../templates/sidebar.php');
     <div class="text">Pembayaran</div>
     <div class="container">
         <form action="" method="post" class="form-dashboard">
-
             <div class="form-group">
                 <label for="idpembayaran">Id Pembayaran</label>
                 <input type="text" name="idpembayaran" id="idpembayaran" disabled value="" placeholder="Terisi otomatis">

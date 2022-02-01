@@ -11,12 +11,6 @@ if (!Session::has('authenticated')) {
 
 $petugas = Dashboard::readPetugas();
 
-if (isset($_POST['delete'])) {
-    $idpetugas = $_POST['idpetugas'];
-    Dashboard::deletePetugas($idpetugas);
-    Flasher::set('Petugas dihapus!');
-}
-
 reqFile('../templates/header.php');
 reqFile('../templates/sidebar.php');
 ?>
@@ -40,15 +34,21 @@ reqFile('../templates/sidebar.php');
                     <td><?= $p['password'] ?></td>
                     <td><?= $p['nama_petugas'] ?></td>
                     <td><?= $p['nama_otorisasi'] ?></td>
+                    <?php
+                    // $cipher = "aes-128-gcm";
+                    // $ivlen = openssl_cipher_iv_length($cipher);
+                    // $iv = openssl_random_pseudo_bytes($ivlen);
+                    // $encrypt = openssl_encrypt($p['id_petugas'], $cipher, 'siwa', $options = 0, $iv, $tag);
+                    // var_dump(openssl_decrypt($encrypt, $cipher, 'siwa', $option = 0, $iv, $tag));
+                    ?>
                     <td>
-                        <form action="" method="post">
-                            <input type="hidden" name="idpetugas" value="<?= $p['id_petugas']; ?>">
-                            <button type="submit" name="delete">Hapus</button>
-                        </form>
+                        <a href="updatePetugas.php?idpetugas=<?= $p['id_petugas'] ?>">Edit</a>
+                        <a href="deletePetugas.php?idpetugas=<?= $p['id_petugas'] ?>">Hapus</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
         </table>
+
     </div>
 </section>
 

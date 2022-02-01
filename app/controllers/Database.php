@@ -111,6 +111,7 @@ class Database
         return $result;
     }
 
+    // ================================== Pembayaran
     public function payment($idpembayaran, $idpetugas, $nisn, $tglbayar, $bulan, $tahun, $idspp, $jumlah)
     {
         $siswaIdSpp = $this->table('spp')->where('id_spp', '=', $idspp)->get()->fetch_assoc();
@@ -127,10 +128,27 @@ class Database
         return $this->conn->query($updateNominalSpp);
     }
 
+    // ================================== Petugas
     public function addPetugas($idpetugas, $username, $password, $nama, $otorisasi)
     {
         try {
             $query = "INSERT INTO $this->table VALUES ('$idpetugas', '$username', '$password', '$nama', '$otorisasi')";
+
+            if (!$this->conn->query($query)) {
+                throw new Exception("Ada kesalahan! Cek fungsi ini " . '(' . __FUNCTION__ . ')', 1);
+            } else {
+                return $this->conn->query($query);
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+    }
+
+    public function updatePetugas($idpetugas, $username, $nama, $otorisasi)
+    {
+        try {
+            $query = "UPDATE petugas SET username = '$username', nama_petugas = '$nama', level = '$otorisasi' WHERE id_petugas = '$idpetugas'";
 
             if (!$this->conn->query($query)) {
                 throw new Exception("Ada kesalahan! Cek fungsi ini " . '(' . __FUNCTION__ . ')', 1);
@@ -159,7 +177,58 @@ class Database
         return $result;
     }
 
-    // ajax handler
+    // ================================== Kelas
+    public function addKelas($nama, $kompetensi)
+    {
+        try {
+            $query = "INSERT INTO $this->table VALUES ('', '$nama', '$kompetensi')";
+
+            if (!$this->conn->query($query)) {
+                throw new Exception("Ada kesalahan! Cek fungsi ini " . '(' . __FUNCTION__ . ')', 1);
+            } else {
+                return $this->conn->query($query);
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+    }
+
+    public function updateKelas($idkelas, $nama, $kompetensi)
+    {
+        try {
+            $query = "UPDATE kelas SET nama_kelas = '$nama', kompetensi_keahlian = '$kompetensi' WHERE id_kelas = '$idkelas'";
+
+            if (!$this->conn->query($query)) {
+                throw new Exception("Ada kesalahan! Cek fungsi ini " . '(' . __FUNCTION__ . ')', 1);
+            } else {
+                return $this->conn->query($query);
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+    }
+
+    public function deleteKelas($idkelas)
+    {
+        try {
+            $query = "DELETE FROM $this->table WHERE id_kelas = $idkelas";
+
+            if (!$this->conn->query($query)) {
+                throw new Exception("Ada kesalahan! Cek fungsi ini " . '(' . __FUNCTION__ . ')', 1);
+            }
+
+            $result = $this->conn->query($query);
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+        return $result;
+    }
+
+
+    // ================================== AJAX HANDLER
     public static function getDetailSiswaByNis($nisn)
     {
         $db = new Database;
