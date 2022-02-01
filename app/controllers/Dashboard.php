@@ -119,4 +119,11 @@ class Dashboard
         $db = new Database;
         return $db->table('kelas')->deleteKelas($idkelas);
     }
+
+    // ================================== Siswa
+    public static function readSiswa()
+    {
+        $db = new Database;
+        return $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas')->get();
+    }
 }

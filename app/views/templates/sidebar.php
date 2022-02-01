@@ -34,6 +34,16 @@ if (isset($_POST['logout'])) {
 
             <?php if (Session::get('level') == 2) : ?>
                 <li>
+                    <a href="../siswa/index.php" class="<?= (currentApp() == 'siswa/index' || currentApp() == 'siswa/addSiswa' ? 'active' : '') ?>">
+                        <i class='bx bxs-graduation'></i>
+                        <span class="links-name">Siswa</span>
+                    </a>
+                    <span class="tooltip">Siswa</span>
+                </li>
+            <?php endif; ?>
+
+            <?php if (Session::get('level') == 2) : ?>
+                <li>
                     <a href="../petugas/index.php" class="<?= (currentApp() == 'petugas/index' || currentApp() == 'petugas/addPetugas' || currentApp() == 'petugas/updatePetugas' ? 'active' : '') ?>">
                         <i class='bx bx-user'></i>
                         <span class="links-name">Petugas</span>
