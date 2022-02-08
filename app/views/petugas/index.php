@@ -20,7 +20,7 @@ reqFile('../templates/sidebar.php');
     <div class="text">Petugas</div>
     <div class="container">
         <a href="addPetugas.php">Tambah Petugas</a>
-        <table border="1">
+        <table>
             <tr>
                 <th>Username</th>
                 <th>Password</th>

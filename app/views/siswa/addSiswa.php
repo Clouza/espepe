@@ -9,12 +9,19 @@ if (!Session::has('authenticated')) {
     return redirect('../../index.php');
 }
 
-$otorisasi = Dashboard::getRole();
+$kelas = Dashboard::getKelas();
 
 if (isset($_POST['tambahSiswa'])) {
-    // $namakelas = $_POST['namakelas'];
-    // $kompetensikeahlian = $_POST['kompetensikeahlian'];
-    // Dashboard::addKelas($namakelas, $kompetensikeahlian);
+    $nisn = $_POST['nisn'];
+    $nis = $_POST['nis'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $nama = $_POST['nama'];
+    $idkelas = $_POST['idkelas'];
+    $alamat = $_POST['alamat'];
+    $notelp = $_POST['notelp'];
+
+    Dashboard::addSiswa($nisn, $nis, $email, $password, $nama, $idkelas, $alamat, $notelp);
     Flasher::set('Siswa ditambahkan!');
     redirect('index.php');
 }
@@ -31,24 +38,31 @@ reqFile('../templates/sidebar.php');
         <form action="" method="post" class="form-dashboard">
             <div class="form-group">
                 <label for="nisn">NISN</label>
-                <input type="text" name="nisn" id="nisn" required>
+                <input type="number" min="0" name="nisn" id="nisn" required>
             </div>
             <div class="form-group">
                 <label for="nis">NIS</label>
-                <input type="text" name="nis" id="nis" required>
+                <input type="number" min="" name="nis" id="nis" required>
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="text" name="email" id="email" required>
+                <input type="email" name="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" required>
             </div>
             <div class="form-group">
                 <label for="nama">Nama</label>
                 <input type="text" name="nama" id="nama" required>
             </div>
             <div class="form-group">
-                <label for="idkelas">ID Kelas</label>
+                <label for="idkelas">Kelas</label>
                 <select name="idkelas" id="idkelas">
                     <option value="" selected disabled>-- Pilih Kelas --</option>
+                    <?php foreach ($kelas as $k) : ?>
+                        <option value="<?= $k['id_kelas']; ?>"><?= $k['nama_kelas']; ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div class="form-group">
@@ -57,13 +71,13 @@ reqFile('../templates/sidebar.php');
             </div>
             <div class="form-group">
                 <label for="notelp">No Telp</label>
-                <input type="text" name="notelp" id="notelp" required>
+                <input type="number" min="0" name="notelp" id="notelp" required>
             </div>
             <div class="form-group">
                 <label for="idspp">ID spp</label>
-                <input type="text" name="idspp" id="idspp" required value="Terisi otomatis" disabled>
+                <input type="text" id="idspp" required value="Terisi otomatis" disabled>
             </div>
-            <button type="submit" name="tambahSiswa">Tambah</button>
+            <button type="submit" class="btn" name="tambahSiswa">Tambah</button>
         </form>
     </div>
 </section>

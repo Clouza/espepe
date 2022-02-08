@@ -20,7 +20,7 @@ reqFile('../templates/sidebar.php');
     <div class="text">Kelas</div>
     <div class="container">
         <a href="addKelas.php">Tambah Kelas</a>
-        <table border="1">
+        <table>
             <tr>
                 <th>Nama Kelas</th>
                 <th>kompetensi Keahlian</th>

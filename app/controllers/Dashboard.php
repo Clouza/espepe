@@ -53,7 +53,7 @@ class Dashboard
     public static function readPetugas()
     {
         $db = new Database;
-        $join = $db->join('petugas', 'JOIN', 'otorisasi', 'petugas.level = otorisasi.id_otorisasi')->get();
+        $join = $db->join('petugas', 'JOIN', 'otorisasi', 'petugas.level = otorisasi.id_otorisasi')->orderBy('id_petugas')->get();
 
         return $join;
     }
@@ -64,11 +64,12 @@ class Dashboard
         return $db->table('petugas')->where('id_petugas', '=', $idpetugas)->get()->fetch_assoc();
     }
 
-    public static function addPetugas($idpetugas, $username, $password, $nama, $otorisasi)
+    public static function addPetugas($username, $password, $nama, $otorisasi)
     {
         $db = new Database;
-        $petugas = $db->table('petugas')->addPetugas($idpetugas, $username, $password, $nama, $otorisasi);
+        $petugas = $db->table('petugas')->addPetugas($username, $password, $nama, $otorisasi);
     }
+
     public static function updatePetugas($idpetugas, $username, $nama, $otorisasi)
     {
         $db = new Database;
@@ -89,6 +90,12 @@ class Dashboard
     }
 
     // ================================== Kelas
+    public static function getKelas()
+    {
+        $db = new Database;
+        return $db->table('kelas')->get();
+    }
+
     public static function readKelas()
     {
         $db = new Database;
@@ -124,6 +131,40 @@ class Dashboard
     public static function readSiswa()
     {
         $db = new Database;
-        return $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas')->get();
+        return $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas JOIN spp ON siswa.id_spp = spp.id_spp')->where('is_deleted', '=', '0')->get();
+    }
+
+    public static function addSiswa($nisn, $nis, $email, $password, $nama, $idkelas, $alamat, $notelp)
+    {
+        $db = new Database;
+
+        // create new row in table spp
+        $db->table('spp')->addSpp();
+
+        // add siswa
+        $db->table('siswa')->addSiswa($nisn, $nis, $email, $password, $nama, $idkelas, $alamat, $notelp);
+
+        // update new row in table siswa according with table spp
+        $foreign = $db->table('siswa')->where('nis', '=', $nis)->get()->fetch_assoc()['nis'];
+        return $db->updateSiswaWithSpp($foreign);
+    }
+
+    public static function updateSiswa($nisn, $nis, $email, $nama, $kelas, $alamat, $notelp)
+    {
+        $db = new Database;
+        $siswa = $db->table('petugas')->updateSiswa($nisn, $nis, $email, $nama, $kelas, $alamat, $notelp);
+        return Flasher::set('Petugas diubah!');
+    }
+
+    public static function readSiswaByNis($nis)
+    {
+        $db = new Database;
+        return $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas JOIN spp ON siswa.id_spp = spp.id_spp')->where('nis', '=', $nis)->get()->fetch_assoc();
+    }
+
+    public static function deleteSiswa($idsiswa)
+    {
+        $db = new Database;
+        return $db->table('siswa')->deleteSiswa($idsiswa);
     }
 }

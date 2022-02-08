@@ -293,16 +293,114 @@
 /* additional */
 .home-section .container {
   padding: 18px;
+  overflow-x: auto;
 }
 
 /* form */
-.form-dashboard {
-  /* border: 1px solid red; */
+.form-group {
+  margin-top: 1em;
 }
 
-.form-group input {
-  padding: 10px;
+.form-group input,
+.form-group select {
+  padding: 10px 1.4em;
   outline: none;
+  border: none;
+  border-radius: 12px;
+}
+
+.form-group select {
+  background-color: white;
+}
+
+/* table */
+table {
+  border: 1px solid #11101D;
+  width: 100%;
+  border-spacing: 10px;
+  color: #11101D;
+  /* border-collapse: collapse; */
+}
+
+table td {
+  /* border: 1px solid black; */
+  border-bottom: 1px solid white;
+  text-align: center;
+  padding: 10px;
+  border-spacing: 10px;
+  position: relative;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 10px 10px rgba(255, 255, 255, 0.1);
+}
+
+table td:after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: 0;
+  width: 0;
+  height: 2px;
+  z-index: 1;
+  background: #1d1b31;
+  transition-duration: .3s;
+  transition-timing-function: ease-out;
+}
+
+table td:hover:after {
+  width: 100%;
+  left: 0;
+  box-shadow: 0 10px 10px rgba(29, 27, 49, 0.2);
+}
+
+table td:hover {
+  color: #1d1b31;
+}
+
+table td a:hover {
+  color: #1d1b31;
+}
+
+/* fieldset */
+fieldset {
+  padding: 10px;
+}
+
+fieldset legend {
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+
+/* button */
+.btn {
+  position: relative;
+  padding: 4px 10px;
+  margin: 1em 0;
+  cursor: pointer;
+  background-color: transparent;
+  border: 2px solid #11101D;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #11101D;
+  color: transparent;
+  transition-duration: .3s;
+  transition-timing-function: ease-out;
+}
+
+.btn:active::after {
+  content: 'Yakin?';
+  left: 0;
+  width: 100%;
+  color: white;
 }
 
 @media (max-width: 420px) {

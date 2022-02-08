@@ -20,7 +20,7 @@ reqFile('../templates/sidebar.php');
     <div class="text">Siswa</div>
     <div class="container">
         <a href="addSiswa.php">Tambah Siswa</a>
-        <table border="1">
+        <table>
             <tr>
                 <th>NISN</th>
                 <th>NIS</th>
@@ -29,7 +29,7 @@ reqFile('../templates/sidebar.php');
                 <th>Kelas</th>
                 <th>Alamat</th>
                 <th>No Telp</th>
-                <th>Id SPP</th>
+                <th>Nominal</th>
                 <th>Aksi</th>
             </tr>
             <?php foreach ($siswa as $s) : ?>
@@ -41,9 +41,10 @@ reqFile('../templates/sidebar.php');
                     <td><?= $s['nama_kelas'] ?></td>
                     <td><?= $s['alamat'] ?></td>
                     <td><?= $s['no_telp'] ?></td>
-                    <td><?= $s['id_spp'] ?></td>
+                    <td>Rp<?= $s['nominal'] ?></td>
                     <td>
-                        <a href="deleteSiswa.php?idsiswa=<?= $s['nis'] ?>">Hapus</a>
+                        <a href="updateSiswa.php?idsiswa=<?= $s['nis'] ?>">Edit</a>
+                        <a href="deleteSiswa.php?idsiswa=<?= $s['nis'] ?>" onclick="return confirm('Anda yakin?');">Hapus</a>
                     </td>
                 </tr>
             <?php endforeach; ?>

@@ -90,7 +90,7 @@ reqFile('../templates/sidebar.php');
                 <input type="number" name="jumlahbayar" id="jumlahbayar" min="0" required>
             </div>
 
-            <button type="submit" name="payday">Input data</button>
+            <button type="submit" class="btn" name="payday">Input data</button>
 
         </form>
     </div>

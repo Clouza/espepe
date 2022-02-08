@@ -10,7 +10,7 @@ if (isset($_POST['sendtoken'])) {
     $email = $_POST['email'];
     $verify = new MailController($email);
 
-    if (!$verify) { // true
+    if ($verify) { // true
         Flasher::set('Token berhasil dikirim. Cek email Anda!');
     } else {
         Flasher::set('Token gagal dikirim. Silahkan laporkan hal ini kepada orang sebelahmu.');

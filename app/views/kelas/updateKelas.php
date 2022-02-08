@@ -15,6 +15,7 @@ if (isset($_POST['updateKelas'])) {
     $nama = $_POST['namakelas'];
     $kompetensi = $_POST['kompetensi'];
     Dashboard::updateKelas($idkelas, $nama, $kompetensi);
+    Flasher::set('Kelas berhasil diubah!');
     redirect('index.php');
 }
 
@@ -37,7 +38,7 @@ reqFile('../templates/sidebar.php');
                 <label for="kompetensi">Kompetensi Keahlian</label>
                 <input type="text" name="kompetensi" id="kompetensi" value="<?= $kelas['kompetensi_keahlian'] ?>" required>
             </div>
-            <button type="submit" name="updateKelas">Update</button>
+            <button type="submit" class="btn" name="updateKelas">Update</button>
         </form>
     </div>
 </section>

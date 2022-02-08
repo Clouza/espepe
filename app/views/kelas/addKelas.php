@@ -37,7 +37,7 @@ reqFile('../templates/sidebar.php');
                 <label for="kompetensiKeahlian">Kompetensi Keahlian</label>
                 <input type="text" name="kompetensikeahlian" id="kompetensiKeahlian" required>
             </div>
-            <button type="submit" name="tambahKelas">Tambah</button>
+            <button type="submit" class="btn" name="tambahKelas">Tambah</button>
         </form>
     </div>
 </section>

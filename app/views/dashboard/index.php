@@ -7,6 +7,12 @@ if (!Session::has('authenticated')) {
   return redirect('../../index.php');
 }
 
+if (Session::get('nisn')) {
+  return redirect('history.php');
+} else {
+  return redirect('pembayaran.php');
+}
+
 reqFile('../templates/header.php');
 reqFile('../templates/sidebar.php');
 ?>

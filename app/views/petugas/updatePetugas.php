@@ -55,7 +55,7 @@ reqFile('../templates/sidebar.php');
                     <?php endforeach; ?>
                 </select>
             </div>
-            <button type="submit" name="updatePetugas">Update</button>
+            <button type="submit" class="btn" name="updatePetugas">Update</button>
         </form>
     </div>
 </section>

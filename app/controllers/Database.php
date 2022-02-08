@@ -26,7 +26,7 @@ class Database
     private $username = 'root';
     private $password = '';
     private $database = 'db_spp';
-    private $conn;
+    public $conn;
 
     private
         // table function
@@ -36,7 +36,9 @@ class Database
         // join
         $join,
         // order by
-        $orderBy;
+        $orderBy,
+        // limit
+        $limit;
 
     public function __construct()
     {
@@ -87,6 +89,12 @@ class Database
         return $this;
     }
 
+    public function limit($limit)
+    {
+        $this->limit = "LIMIT $limit";
+        return $this;
+    }
+
     // will be active when have learned PDO
     // public function insert($data = [])
     // {
@@ -105,9 +113,8 @@ class Database
     public function get()
     {
         // standard query select
-        $sql = "SELECT * FROM $this->table $this->join $this->where $this->orderBy";
+        $sql = "SELECT * FROM $this->table $this->join $this->where $this->orderBy $this->limit";
         $result = $this->conn->query($sql); // return object mysqli result
-
         return $result;
     }
 
@@ -129,15 +136,12 @@ class Database
     }
 
     // ================================== Petugas
-    public function addPetugas($idpetugas, $username, $password, $nama, $otorisasi)
+    public function addPetugas($username, $password, $nama, $otorisasi)
     {
         try {
-            $query = "INSERT INTO $this->table VALUES ('$idpetugas', '$username', '$password', '$nama', '$otorisasi')";
-
+            $query = "INSERT INTO $this->table VALUES ('', '$username', '$password', '$nama', '$otorisasi')";
             if (!$this->conn->query($query)) {
-                throw new Exception("Ada kesalahan! Cek fungsi ini " . '(' . __FUNCTION__ . ')', 1);
-            } else {
-                return $this->conn->query($query);
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
             }
         } catch (Exception $e) {
             echo $e->getMessage();
@@ -151,22 +155,21 @@ class Database
             $query = "UPDATE petugas SET username = '$username', nama_petugas = '$nama', level = '$otorisasi' WHERE id_petugas = '$idpetugas'";
 
             if (!$this->conn->query($query)) {
-                throw new Exception("Ada kesalahan! Cek fungsi ini " . '(' . __FUNCTION__ . ')', 1);
-            } else {
-                return $this->conn->query($query);
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
             }
         } catch (Exception $e) {
             echo $e->getMessage();
             die;
         }
     }
+
     public function deletePetugas($idpetugas)
     {
         try {
             $query = "DELETE FROM $this->table WHERE id_petugas = $idpetugas";
 
             if (!$this->conn->query($query)) {
-                throw new Exception("Ada kesalahan! Cek fungsi ini " . '(' . __FUNCTION__ . ')', 1);
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
             }
 
             $result = $this->conn->query($query);
@@ -182,11 +185,8 @@ class Database
     {
         try {
             $query = "INSERT INTO $this->table VALUES ('', '$nama', '$kompetensi')";
-
             if (!$this->conn->query($query)) {
-                throw new Exception("Ada kesalahan! Cek fungsi ini " . '(' . __FUNCTION__ . ')', 1);
-            } else {
-                return $this->conn->query($query);
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
             }
         } catch (Exception $e) {
             echo $e->getMessage();
@@ -200,9 +200,7 @@ class Database
             $query = "UPDATE kelas SET nama_kelas = '$nama', kompetensi_keahlian = '$kompetensi' WHERE id_kelas = '$idkelas'";
 
             if (!$this->conn->query($query)) {
-                throw new Exception("Ada kesalahan! Cek fungsi ini " . '(' . __FUNCTION__ . ')', 1);
-            } else {
-                return $this->conn->query($query);
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
             }
         } catch (Exception $e) {
             echo $e->getMessage();
@@ -216,7 +214,7 @@ class Database
             $query = "DELETE FROM $this->table WHERE id_kelas = $idkelas";
 
             if (!$this->conn->query($query)) {
-                throw new Exception("Ada kesalahan! Cek fungsi ini " . '(' . __FUNCTION__ . ')', 1);
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
             }
 
             $result = $this->conn->query($query);
@@ -227,6 +225,106 @@ class Database
         return $result;
     }
 
+    // ================================== Siswa
+    public function addSiswa($nisn, $nis, $email, $password, $nama, $idkelas, $alamat, $notelp)
+    {
+        try {
+            $query = "INSERT INTO $this->table VALUES ('$nisn', '$nis', '$email', '$password', '$nama', '$idkelas', '$alamat', '$notelp', '', '')";
+
+            if (!$this->conn->query($query)) {
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+    }
+
+    public function updateSiswaWithSpp($nis)
+    {
+        try {
+            $db = new Database;
+            $getCurrentSPP = $db->table('spp')->orderBy('id_spp', 'DESC')->limit('1')->get()->fetch_assoc()['id_spp'];
+            $query = "UPDATE siswa SET id_spp = '$getCurrentSPP' WHERE nis = '$nis'";
+
+            if (!$this->conn->query($query)) {
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+    }
+
+    public function updateSiswa($nisn, $nis, $email, $nama, $kelas, $alamat, $notelp)
+    {
+        try {
+            // update siswa
+            $query = "UPDATE siswa SET nisn = '$nisn', nis = '$nis', email = '$email', nama = '$nama', id_kelas = '$kelas', alamat = '$alamat', no_telp = '$notelp' WHERE nisn = '$nisn'";
+
+            if (!$this->conn->query($query)) {
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+    }
+
+
+    public function deleteSiswa($idsiswa)
+    {
+        try {
+            // take id spp from $idsiswa
+            $siswaSelected = $this->table('siswa')->where('nis', '=', $idsiswa)->get()->fetch_assoc();
+            $siswaSelected = $siswaSelected['id_spp'];
+
+            // delete siswa (not actually deleted)
+            $query = "UPDATE $this->table SET is_deleted = '1' WHERE nis = $idsiswa";
+
+            if (!$this->conn->query($query)) {
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
+            }
+
+            $result = $this->conn->query($query);
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+        return $result;
+    }
+
+    // ================================== SPP
+    public function addSpp()
+    {
+        try {
+            $now = date('Y');
+            $query = "INSERT INTO $this->table VALUES('', '$now', '0')";
+
+            if (!$this->conn->query($query)) {
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+    }
+
+    // ================================== EMAIL
+    public function addToken($token, $email)
+    {
+        try {
+            $expired = time();
+            $query = "INSERT INTO $this->table VALUES('', '$token', '$email', '$expired')";
+
+            if (!$this->conn->query($query)) {
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+    }
 
     // ================================== AJAX HANDLER
     public static function getDetailSiswaByNis($nisn)

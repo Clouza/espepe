@@ -3,7 +3,7 @@
 // cek token
 if (isset($_GET['token'])) {
     $token = $_GET['token'];
-    $tokenInDatabase = 'L3nKjw9RuHYyz16uqAoGEWTI1O6dFzQ09c3fqmOja7wi92t3PREBDukBIvCj5G4rJD/1oQmskIwYDtgC3R5RnA==';
+    $tokenInDatabase = 'sBODUz5AMlsA2JSvtITSjBWDIhcrfumgZQ1nKvyc3IUQ+fZnvlFO+2+MyWrsxkqp5cjck2MbPAw18bkb1wwkw==';
 
     // check token if match
     if ($token == $tokenInDatabase) {

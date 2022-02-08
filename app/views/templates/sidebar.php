@@ -9,9 +9,9 @@ if (isset($_POST['logout'])) {
 ?>
 
 <body>
-    <div class="sidebar open">
+    <div class="sidebar">
         <div class="logo-details">
-            <div class="logo-name">PBW</div>
+            <div class="logo-name">ESPEPE</div>
             <i class='bx bx-menu' id="btn"></i>
         </div>
 

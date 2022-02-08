@@ -30,12 +30,14 @@ reqFile('../templates/sidebar.php');
     <div class="container">
         <?php if (Session::has('level')) : ?>
             <form action="" method="post">
-                <input type="text" placeholder="Cari NIS" name="nis">
-                <button type="submit" name="cariNIS">Cari</button>
-                <button onclick="window.print()">Cetak</button>
+                <div class="form-group">
+                    <input type="text" placeholder="Cari NIS" name="nis">
+                    <button type="submit" class="btn" name="cariNIS">Cari</button>
+                    <button type="button" class="btn" id="cetakNota">Cetak</button>
+                </div>
             </form>
         <?php endif; ?>
-        <table>
+        <table id="history" class="mt-1">
             <tr>
                 <th>Petugas</th>
                 <th>Tanggal</th>
@@ -49,7 +51,7 @@ reqFile('../templates/sidebar.php');
                     <td><?= $h['tgl_bayar']; ?></td>
                     <td><?= $h['bulan_dibayar']; ?></td>
                     <td><?= $h['tahun_dibayar']; ?></td>
-                    <td><?= $h['jumlah_dibayar']; ?></td>
+                    <td>Rp<?= number_format($h['jumlah_dibayar'], '2', '.', ','); ?></td>
                 </tr>
             <?php endforeach; ?>
         </table>

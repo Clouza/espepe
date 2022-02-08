@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Controllers\Database;
+
 class MailController
 {
     private
@@ -30,21 +32,21 @@ class MailController
             'X-Mailer: PHP/' . phpversion()
         ];
 
-        $this->message = $this->html();
+        $this->message = $this->html($email);
 
         return $this;
     }
 
     private function send()
     {
-        // return mail($this->to, $this->subject, $this->message, implode("\r\n", $this->headers));
-        return mail('siwananda23@gmail.com', 'Email Verification', 'Just Email');
+        return mail($this->to, $this->subject, $this->message, implode("\r\n", $this->headers));
     }
 
-    private function html()
+    private function html($email)
     {
         // make random
-        $random = base64_encode(random_bytes(64));
+        $token = base64_encode(random_bytes(64));
+        $this->addToken($token, $email);
         return "
             <!DOCTYPE html>
             <html lang='en'>
@@ -57,10 +59,17 @@ class MailController
             </head>
             
             <body>
-                <h1>Hai <s>pemain 1</s> kamu yang disana! Ini link untuk verifikasi email kamu:</h1>
-                <a href='http://localhost/espepe/app/views/utility/mailrequest.php?token=$random'>Verifikasi email ini</a>
+                <h1>Hai!! Ini link untuk verifikasi email kamu:</h1>
+                <a href='http://localhost/espepe/app/views/utility/mailrequest.php?token=$token'>Verifikasi</a>
             </body>
             
-            </html>";
+            </html>
+        ";
+    }
+
+    private function addToken($token, $email)
+    {
+        $db = new Database;
+        $db->table('token')->addToken($token, $email);
     }
 }
