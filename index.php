@@ -33,11 +33,11 @@ Auth::checkLog($_POST);
 
 <body>
     <form action="" method="post">
-        <div class="form-group">
-            <h1>Hi, Welcome back!</h1>
+        <div class="form-group align-items-center">
+            <img src="https://elearning.smkti-baliglobal.sch.id/img/logo-ti2.png" alt="logo" width="150px">
         </div>
         <div class="form-group">
-            <label for="user">Nomor Induk Siswa (NIS)</label>
+            <label for="user">NIS / Email / Username</label>
             <input type="text" id="user" name="user" required tabindex="1">
         </div>
         <div class="form-group">
@@ -48,37 +48,12 @@ Auth::checkLog($_POST);
         <button type="submit">Sign in</button>
     </form>
 
-    <small class="mt-1" id="music">Playing...</small>
-
     <?php if (Session::has('flashMessage')) : ?>
         <div class="flash-message">
             <span><?= Flash::get() ?></span>
         </div>
     <?php endif; ?>
 
-    <script>
-        let music = document.querySelector('#music');
-        let list = [
-            'Sedliv - Be There For You (Feat. Kinnie Lane)',
-            'This Feeling - my!lane',
-            'Umbrella - why mona binayz remix'
-        ];
-
-        // looping
-        textSequence(0);
-
-        function textSequence(i) {
-            if (list.length > i) {
-                setTimeout(function() {
-                    music.innerHTML = list[i];
-                    textSequence(++i);
-                }, 2000); // 2 second (in milliseconds)
-
-            } else if (list.length == i) { // loop
-                textSequence(0);
-            }
-        }
-    </script>
 </body>
 
 </html>

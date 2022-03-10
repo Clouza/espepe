@@ -13,7 +13,7 @@ if (isset($_POST['sendtoken'])) {
     if ($verify) { // true
         Flasher::set('Token berhasil dikirim. Cek email Anda!');
     } else {
-        Flasher::set('Token gagal dikirim. Silahkan laporkan hal ini kepada orang sebelahmu.');
+        Flasher::set('Token gagal dikirim! Email tidak ada.');
     }
 }
 ?>

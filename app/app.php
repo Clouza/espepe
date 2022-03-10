@@ -69,3 +69,19 @@ function currentApp()
     $currentPATH = $currentPATH[0];
     return $currentPATH;
 }
+
+// redirect to error page
+function abort($number)
+{
+    switch ($number) {
+        case 404:
+            reqFile('../errors/404.php');
+            break;
+        case 503:
+            reqFile('../errors/404.php');
+            break;
+        default:
+            reqFile('../errors/404.php');
+            break;
+    }
+}

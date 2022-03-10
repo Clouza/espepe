@@ -9,6 +9,10 @@ if (!Session::has('authenticated')) {
     return redirect('../../index.php');
 }
 
+if (Session::get('level') != '2') {
+    return abort(404);
+}
+
 $kelas = Dashboard::getKelas();
 
 if (isset($_POST['tambahSiswa'])) {
@@ -34,7 +38,7 @@ reqFile('../templates/sidebar.php');
 <section class="home-section">
     <div class="text">Tambah Siswa</div>
     <div class="container">
-        <a href="index.php">Kembali</a>
+        <a href="index.php"><button class="btn btn-action-back">&#8592; Kembali</button></a>
         <form action="" method="post" class="form-dashboard">
             <div class="form-group">
                 <label for="nisn">NISN</label>
@@ -77,7 +81,7 @@ reqFile('../templates/sidebar.php');
                 <label for="idspp">ID spp</label>
                 <input type="text" id="idspp" required value="Terisi otomatis" disabled>
             </div>
-            <button type="submit" class="btn" name="tambahSiswa">Tambah</button>
+            <button type="submit" class="btn btn-confirm" name="tambahSiswa">Tambah</button>
         </form>
     </div>
 </section>

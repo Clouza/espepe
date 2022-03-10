@@ -32,8 +32,10 @@ reqFile('../templates/sidebar.php');
             <form action="" method="post">
                 <div class="form-group">
                     <input type="text" placeholder="Cari NIS" name="nis">
-                    <button type="submit" class="btn" name="cariNIS">Cari</button>
-                    <button type="button" class="btn" id="cetakNota">Cetak</button>
+                    <button type="submit" class="btn btn-confirm" name="cariNIS">Cari</button>
+                    <?php if (Session::get('level') == 2) : ?>
+                        <button type="button" class="btn" id="cetakNota">Cetak</button>
+                    <?php endif; ?>
                 </div>
             </form>
         <?php endif; ?>

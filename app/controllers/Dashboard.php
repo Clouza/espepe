@@ -8,6 +8,17 @@ use Exception;
 
 class Dashboard
 {
+    // ================================== General Functions & Properties
+    public static $bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    public static function assocRead($result)
+    {
+        $rows = [];
+        while ($row = $result->fetch_assoc()) {
+            $rows[] = $row;
+        }
+        return $rows;
+    }
+
     // ================================== Pembayaran
     public static function payday($idpembayaran, $idpetugas, $nisn, $tglbayar, $bulan, $tahun, $idspp, $jumlah)
     {
@@ -17,9 +28,12 @@ class Dashboard
         $siswa = $db->table('siswa')->where('nisn', '=', $nisn)->get()->fetch_assoc();
         $idspp = $siswa['id_spp'];
 
-        $db->payment($idpembayaran, $idpetugas, $nisn, $tglbayar, $bulan, $tahun, $idspp, $jumlah);
+        $check = $db->payment($idpembayaran, $idpetugas, $nisn, $tglbayar, $bulan, $tahun, $idspp, $jumlah);
 
-        return Flasher::set('Pembayaran ditambahkan');
+        if ($check) {
+            return Flasher::set("Pembayaran gagal! Tahun dan Bulan sudah ada!");
+        }
+        return Flasher::set("Pembayaran berhasil!");
     }
 
     public static function getSiswa()
@@ -99,7 +113,7 @@ class Dashboard
     public static function readKelas()
     {
         $db = new Database;
-        return $db->table('kelas')->get();
+        return $db->table('kelas')->orderBy('kompetensi_keahlian', 'DESC, kelas')->get();
     }
 
     public static function readKelasById($idkelas)
@@ -108,16 +122,16 @@ class Dashboard
         return $db->table('kelas')->where('id_kelas', '=', $idkelas)->get()->fetch_assoc();
     }
 
-    public static function addKelas($nama, $kompetensi)
+    public static function addKelas($nama, $kompetensi, $kelas, $harga)
     {
         $db = new Database;
-        $kelas = $db->table('kelas')->addKelas($nama, $kompetensi);
+        $kelas = $db->table('kelas')->addKelas($nama, $kompetensi, $kelas, $harga);
     }
 
-    public static function updateKelas($idkelas, $nama, $kompetensi)
+    public static function updateKelas($idkelas, $nama, $kompetensi, $kelas, $harga)
     {
         $db = new Database;
-        $kelas = $db->table('kelas')->updateKelas($idkelas, $nama, $kompetensi);
+        $kelas = $db->table('kelas')->updateKelas($idkelas, $nama, $kompetensi, $kelas, $harga);
         return Flasher::set('Kelas diubah!');
     }
 
@@ -131,18 +145,18 @@ class Dashboard
     public static function readSiswa()
     {
         $db = new Database;
-        return $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas JOIN spp ON siswa.id_spp = spp.id_spp')->where('is_deleted', '=', '0')->get();
+        return $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas JOIN spp ON siswa.id_spp = spp.id_spp')->where('is_deleted', '=', '0')->orderBy('nis', 'ASC')->get();
     }
 
     public static function addSiswa($nisn, $nis, $email, $password, $nama, $idkelas, $alamat, $notelp)
     {
         $db = new Database;
 
-        // create new row in table spp
-        $db->table('spp')->addSpp();
-
         // add siswa
         $db->table('siswa')->addSiswa($nisn, $nis, $email, $password, $nama, $idkelas, $alamat, $notelp);
+
+        // create new row in table spp
+        $db->table('spp')->addSpp();
 
         // update new row in table siswa according with table spp
         $foreign = $db->table('siswa')->where('nis', '=', $nis)->get()->fetch_assoc()['nis'];
@@ -166,5 +180,60 @@ class Dashboard
     {
         $db = new Database;
         return $db->table('siswa')->deleteSiswa($idsiswa);
+    }
+
+    // ================================== Search
+    public static function searchSiswa($like)
+    {
+        $db = new Database;
+        $nama = $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas')->search('nama', $like)->get();
+        $nis = $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas')->search('nis', $like)->get();
+        $email = $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas')->search('email', $like)->get();
+        if (mysqli_num_rows($nama) > 0) {
+            return $nama;
+        } else if (mysqli_num_rows($nis) > 0) {
+            return $nis;
+        } else {
+            return $email;
+        }
+    }
+
+    public static function searchKelas($like)
+    {
+        $db = new Database;
+        $like = str_replace('-', ' ', $like);
+        return $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas')->search('nama_kelas', $like)->and('is_deleted = 0')->get();
+    }
+
+    // ================================== SPP
+    public static function readSPPWithSiswa()
+    {
+        $db = new Database;
+        return $db->table('spp')->join('spp', 'JOIN', 'siswa', 'spp.id_spp = siswa.id_spp JOIN kelas ON siswa.id_kelas = kelas.id_kelas')->where('is_deleted', '=', '0')->orderBy('nis', 'ASC')->get();
+    }
+
+    public static function readDetailSPPWithDetailSiswa($nis)
+    {
+        $db = new Database;
+        return $db->table('spp')->join('spp', 'JOIN', 'siswa', 'spp.id_spp = siswa.id_spp JOIN kelas ON kelas.id_kelas = siswa.id_kelas')->where('nis', '=', $nis)->get()->fetch_assoc();
+    }
+
+    public static function readBulanByPembayaran($idspp, $tahun)
+    {
+        $db = new Database;
+        $pembayaran = $db->table('pembayaran')->where('id_spp', '=', $idspp)->and('tahun_dibayar = ' . $tahun)->get();
+
+        $bulan = [];
+        foreach ($pembayaran as $p) {
+            // $bulan[] .= ucwords($p['bulan_dibayar']);
+            array_push($bulan, ucwords($p['bulan_dibayar']));
+        }
+        return $bulan;
+    }
+
+    public static function reset($password, $level, $username)
+    {
+        $db = new Database;
+        return $db->resetSPP($password, $level, $username);
     }
 }

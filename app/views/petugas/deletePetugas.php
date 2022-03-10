@@ -1,17 +1,13 @@
 <?php
 require_once '../../app.php';
 
-use App\Controllers\Dashboard;
 use App\Controllers\Flasher;
+use App\Controllers\Session;
+use App\Controllers\Dashboard;
 
-// decrypt first
-// $cipher = "aes-128-gcm";
-// $ivlen = openssl_cipher_iv_length($cipher);
-// $iv = openssl_random_pseudo_bytes($ivlen);
-// dd($idpetugas);
-// var_dump(openssl_decrypt($idpetugas, $cipher, 'siwa', $option = 0, $iv, $tag));
-// die;
-
+if (Session::get('level') != '2') {
+    return abort(404);
+}
 $idpetugas = $_GET['idpetugas'];
 
 Dashboard::deletePetugas($idpetugas);

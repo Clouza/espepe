@@ -15,7 +15,16 @@ class MailController
 
     public function __construct($email)
     {
-        return $this->prepare($email)->send();
+        // check email exists
+        $db = new Database;
+        $check = $db->table('siswa')->where('email', '=', $email)->get();
+
+        if ($check->num_rows > 0) {
+            $this->prepare($email);
+            return mail($this->to, $this->subject, $this->message, implode("\r\n", $this->headers));
+        } else {
+            return false;
+        }
     }
 
     private function prepare($email)
@@ -37,34 +46,15 @@ class MailController
         return $this;
     }
 
-    private function send()
-    {
-        return mail($this->to, $this->subject, $this->message, implode("\r\n", $this->headers));
-    }
-
     private function html($email)
     {
         // make random
-        $token = base64_encode(random_bytes(64));
+        $token = str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+
+        // store token to database
         $this->addToken($token, $email);
-        return "
-            <!DOCTYPE html>
-            <html lang='en'>
-            
-            <head>
-                <meta charset='UTF-8'>
-                <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                <title>Email Verification</title>
-            </head>
-            
-            <body>
-                <h1>Hai!! Ini link untuk verifikasi email kamu:</h1>
-                <a href='http://localhost/espepe/app/views/utility/mailrequest.php?token=$token'>Verifikasi</a>
-            </body>
-            
-            </html>
-        ";
+
+        return "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Email Verification</title></head><body><h1>Berikut adalah link untuk reset password Anda:</h1><a href='http://localhost/espepe/app/views/utility/mailrequest.php?token=$token'>Reset Password</a></body></html>";
     }
 
     private function addToken($token, $email)

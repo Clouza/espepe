@@ -8,6 +8,11 @@ use App\Controllers\Flasher;
 if (!Session::has('authenticated')) {
     return redirect('../../index.php');
 }
+
+if (Session::get('level') != '2') {
+    return abort(404);
+}
+
 $otorisasi = Dashboard::getRole();
 $petugas = Dashboard::readPetugasById($_GET['idpetugas']);
 
@@ -28,7 +33,7 @@ reqFile('../templates/sidebar.php');
 <section class="home-section">
     <div class="text">Update Petugas</div>
     <div class="container">
-        <a href="index.php">Kembali</a>
+        <a href="index.php"><button class="btn btn-action-back">&#8592; Kembali</button></a>
         <form action="" method="post" class="form-dashboard">
             <div class="form-group">
                 <label for="idpetugas">Id Petugas</label>
@@ -55,7 +60,7 @@ reqFile('../templates/sidebar.php');
                     <?php endforeach; ?>
                 </select>
             </div>
-            <button type="submit" class="btn" name="updatePetugas">Update</button>
+            <button type="submit" class="btn btn-confirm" name="updatePetugas">Update</button>
         </form>
     </div>
 </section>

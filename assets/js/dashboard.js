@@ -1,23 +1,60 @@
-let sidebar = document.querySelector(".sidebar");
-let closeBtn = document.querySelector("#btn");
-// let searchBtn = document.querySelector(".bx-search");
+const sidebar = document.querySelector(".sidebar");
+const closeBtn = document.querySelector("#btn");
+const footerSidebar = document.querySelector('#footerSidebar');
 
 closeBtn.addEventListener("click", () => {
   sidebar.classList.toggle("open");
-  menuBtnChange(); // calling the function(optional)
+  menuBtnChange();
 });
-
-// searchBtn.addEventListener("click", () => { // Sidebar open when you click on the search iocn
-//   sidebar.classList.toggle("open");
-//   menuBtnChange(); // calling the function(optional)
-// });
 
 // following are the code to change sidebar button(optional)
 function menuBtnChange() {
-  if (sidebar.classList.contains("open")) {
+  if (sidebar.classList.contains("open")) { // if sidebar have class open
+    // sidebar.setAttribute('style', 'background-color: transparent');
     closeBtn.classList.replace("bx-menu", "bx-menu-alt-right"); // replacing the icons class
   } else {
+    // sidebar.setAttribute('style', 'background-color: red');
     closeBtn.classList.replace("bx-menu-alt-right", "bx-menu"); // replacing the icons class
+  }
+}
+
+// search siswa
+const search = document.querySelector('#search');
+if (search != null) {
+  const searchIcon = search.children[0];
+  let searchInput = search.children[1].children[0];
+
+  searchIcon.addEventListener('click', () => {
+    sidebar.classList.toggle("open");
+    searchInput.focus();
+    menuBtnChange();
+  });
+
+  searchSuggest(searchInput);
+
+  function searchSuggest(element) {
+    let container = element;
+    let suggestion = [
+      'Cari Siswa...',
+      'Cari Nis...',
+      'Cari Email...'
+    ];
+
+
+    // looping
+    textSequence(0);
+
+    function textSequence(i) {
+      if (suggestion.length > i) {
+        setTimeout(function () {
+          container.setAttribute('placeholder', suggestion[i]);
+          textSequence(++i);
+        }, 1000);
+
+      } else if (suggestion.length == i) { // loop
+        textSequence(0);
+      }
+    }
   }
 }
 
@@ -41,9 +78,41 @@ if (passGenButton != null) {
   })
 }
 
-// ajax
+// kelas romawi
+const namaKelas = document.querySelector('#namaKelas');
+const kelas = document.querySelector('#kelas');
+
+if (namaKelas != null) {
+  namaKelas.addEventListener('keyup', () => {
+    // change to uppermoon-case
+    namaKelas.value = namaKelas.value.toUpperCase();
+
+    let nama = namaKelas.value;
+    nama = nama.toLowerCase().split(' ', 1);
+    nama = nama[0];
+    switch (nama) {
+      case 'x':
+        kelas.setAttribute('value', '10');
+        break;
+      case 'xi':
+        kelas.setAttribute('value', '11');
+        break;
+      case 'xii':
+        kelas.setAttribute('value', '12');
+        break;
+      default:
+        kelas.setAttribute('value', 'Ketik salah satu berikut: (x, xi, xii)');
+        break;
+    }
+  });
+}
+
+// ================================================
+
+// ajax mencari nis
 const nis = document.querySelector('#nis');
 const information = document.querySelector('#information');
+const jumlahbayar = document.querySelector('#jumlahbayar');
 if (nis != null) {
   nis.addEventListener('change', (e) => {
     let xhr = new XMLHttpRequest();
@@ -55,12 +124,20 @@ if (nis != null) {
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState == 4 && xhr.status == 200) {
+        const response = JSON.parse(xhr.response);
         information.innerHTML = `
         <fieldset>
           <legend>Data Siswa</legend>
-          ${xhr.responseText}
+          NIS: ${response.nis} <br>
+          NAMA: ${response.nama} <br>
+          NO TELP: ${response.no_telp} <br>
+          KELAS: ${response.nama_kelas} <br>
+          KOMPETENSI: ${response.kompetensi_keahlian} <br>
+
+          HARGA DITENTUKAN: Rp${response.harga}
         </fieldset>
         `;
+        jumlahbayar.setAttribute('value', response.harga);
       }
     }
 
@@ -69,12 +146,72 @@ if (nis != null) {
   })
 }
 
+// ajax status siswa
+const toggleActive = document.querySelector('#toggleActive');
+if (toggleActive != null) {
+  toggleActive.addEventListener('click', () => {
+    let checked;
+    if (toggleActive.checked) {
+      checked = 0;
+    } else {
+      checked = 1;
+    }
+
+    let xhr = new XMLHttpRequest();
+    let url = '../../controllers/Database.php';
+    let params = `ns=${nis.value}&func=setStatusSiswa&ic=${checked}`; // ic = is checked
+
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState == 4 && xhr.status == 200) {
+        // window.location.href = 'index.php';
+        location.reload();
+      }
+    }
+
+    xhr.send(params);
+  })
+}
+// date
+const monthList = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+const monthListNumber = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+
+// ajax bulan dibayar 
+const tahun = document.querySelector('#years');
+const bulanDiBayar = document.querySelector('#bulanDiBayar');
+const cekBayar = document.querySelector('#cekbayar');
+
+if (tahun != null) {
+  const idspp = bulanDiBayar.getAttribute('data-spp');
+  tahun.addEventListener('change', () => {
+    let xhr = new XMLHttpRequest();
+    let url = '../../controllers/Database.php';
+    let params = `idspp=${idspp}&tahun=${tahun.value}&func=findPembayaranByTahun`;
+
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState == 4 && xhr.status == 200) {
+        const response = JSON.parse(xhr.responseText);
+        let child = '';
+        response.forEach((v, i) => {
+          child += v;
+        });
+        cekBayar.innerHTML = child;
+      }
+    }
+
+    xhr.send(params);
+  });
+}
+
 // cetak nota
 const cetakNotaBtn = document.querySelector('#cetakNota');
 const tableHistory = document.querySelector('#history');
 
-// date
-const monthList = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 let now = new Date();
 const dd = now.getDate();
 const mm = monthList[now.getMonth()];
@@ -86,9 +223,6 @@ now = `${dd} ${mm} ${yyyy} <br> (${h}:${m}:${s} WITA)`;
 
 if (cetakNotaBtn != null) {
   cetakNotaBtn.addEventListener('click', () => {
-
-    // console.log(tableHistory);
-
     let th = window.open('', ''); // open new tab 
     th.document.write(`
       <html>
@@ -182,3 +316,9 @@ if (cetakNotaBtn != null) {
     th.print();
   });
 }
+
+// set default date (tglbayar)
+const tglbayar = document.querySelector('#tglbayar');
+const today = new Date();
+const mmNum = monthListNumber[today.getMonth()];
+tglbayar.value = `${yyyy}-${mmNum}-${dd}`;

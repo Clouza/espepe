@@ -8,7 +8,12 @@ use App\Controllers\Flasher;
 if (!Session::has('authenticated')) {
     return redirect('../../index.php');
 }
-$siswa = Dashboard::readSiswaByNis($_GET['idsiswa']);
+
+if (Session::get('level') != '2') {
+    return abort(404);
+}
+
+$siswa = Dashboard::readSiswaByNis($_GET['ns']);
 $kelas = Dashboard::readKelas();
 
 if (isset($_POST['updateSiswa'])) {
@@ -32,7 +37,7 @@ reqFile('../templates/sidebar.php');
 <section class="home-section">
     <div class="text">Update Siswa</div>
     <div class="container">
-        <a href="index.php">Kembali</a>
+        <a href="index.php"><button class="btn btn-action-back">&#8592; Kembali</button></a>
         <form action="" method="post" class="form-dashboard">
             <input type="hidden" name="idsiswa" value="<?= $siswa['nisn']; ?>">
             <div class="form-group">
@@ -74,9 +79,16 @@ reqFile('../templates/sidebar.php');
             </div>
             <div class="form-group">
                 <label for="idspp">Nominal (Rp)</label>
-                <input type="text" id="idspp" disabled value="<?= $siswa['nominal']; ?> (Tidak bisa diubah)" required>
+                <input type="text" id="idspp" disabled value="Rp<?= number_format($siswa['nominal'], '2', ',', '.'); ?>- (Tidak bisa diubah)" required>
             </div>
-            <button type="submit" class="btn" name="updateSiswa">Update</button>
+            <div class="status-siswa">
+                <div class="switch">
+                    <input type="checkbox" name="toggleActive" id="toggleActive" <?= ($siswa['is_deleted'] == 0) ? 'checked' : '' ?>>
+                    <span class="slider round"></span>
+                </div>
+                <label for="toggleActive">Status Siswa (<?= ($siswa['is_deleted'] == 0) ? 'Aktif' : 'Non Aktif' ?>)</label>
+            </div>
+            <button type="submit" class="btn btn-confirm" name="updateSiswa">Update</button>
         </form>
     </div>
 </section>

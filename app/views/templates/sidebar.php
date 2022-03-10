@@ -9,6 +9,7 @@ if (isset($_POST['logout'])) {
 ?>
 
 <body>
+    <!-- https://dribbble.com/tags/navigation_bar -->
     <div class="sidebar">
         <div class="logo-details">
             <div class="logo-name">ESPEPE</div>
@@ -17,11 +18,19 @@ if (isset($_POST['logout'])) {
 
         <!-- content sidebar -->
         <ul class="nav-list">
-            <!-- <li>
-                <i class='bx bx-search'></i>
-                <input type="text" placeholder="Search...">
-                <span class="tooltip">Search</span>
-            </li> -->
+            <?php if (Session::get('level') == 2) : ?>
+                <li id="search">
+                    <i class='bx bx-search'></i>
+                    <form action="../dashboard/search.php" method="GET">
+                        <input type="text" name="q" placeholder="Cari Siswa...">
+                        <input type="submit" hidden>
+                    </form>
+                    <span class="tooltip">Cari Siswa</span>
+                </li>
+                <div class="divider"></div>
+            <?php endif; ?>
+
+
             <?php if (Session::get('level') == 2) : ?>
                 <li>
                     <a href="../kelas/index.php" class="<?= (currentApp() == 'kelas/index' || currentApp() == 'kelas/addKelas' || currentApp() == 'kelas/updateKelas' ? 'active' : '') ?>">
@@ -34,11 +43,21 @@ if (isset($_POST['logout'])) {
 
             <?php if (Session::get('level') == 2) : ?>
                 <li>
-                    <a href="../siswa/index.php" class="<?= (currentApp() == 'siswa/index' || currentApp() == 'siswa/addSiswa' ? 'active' : '') ?>">
+                    <a href="../siswa/index.php" class="<?= (currentApp() == 'siswa/index' || currentApp() == 'siswa/addSiswa' || currentApp() == 'siswa/updateSiswa' ? 'active' : '') ?>">
                         <i class='bx bxs-graduation'></i>
                         <span class="links-name">Siswa</span>
                     </a>
                     <span class="tooltip">Siswa</span>
+                </li>
+            <?php endif; ?>
+
+            <?php if (Session::get('level') == 2) : ?>
+                <li>
+                    <a href="../spp/index.php" class="<?= (currentApp() == 'spp/index' || currentApp() == 'spp/detailspp' ? 'active' : '') ?>">
+                        <i class='bx bxs-donate-heart'></i>
+                        <span class="links-name">SPP</span>
+                    </a>
+                    <span class="tooltip">SPP</span>
                 </li>
             <?php endif; ?>
 
@@ -50,7 +69,9 @@ if (isset($_POST['logout'])) {
                     </a>
                     <span class="tooltip">Petugas</span>
                 </li>
+                <div class="divider"></div>
             <?php endif; ?>
+
 
             <?php if (Session::has('level')) : ?>
                 <li>
@@ -70,12 +91,16 @@ if (isset($_POST['logout'])) {
             </li>
 
             <!-- footer sidebar -->
-            <li class="profile">
+            <li class="profile" id="footerSidebar">
                 <div class="profile-details">
-                    <img src="../../../assets/img/profile.png" alt="profileImg">
+                    <img src="https://smkti-baliglobal.sch.id/gambar/icon.png" alt="profileImg">
                     <div class="name-job">
-                        <div class="name"><?= Session::get('profile'); ?></div>
-                        <div class="title"><?= Session::get('nisn'); ?></div>
+                        <?php if (Session::has('level')) : ?>
+                            <div class="name"><?= Session::get('profile'); ?></div>
+                        <?php else : ?>
+                            <div class="name"><?= Session::get('nis'); ?></div>
+                            <div class="title"><?= Session::get('kelas'); ?></div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <form action="" method="post">

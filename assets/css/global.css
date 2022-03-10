@@ -2,8 +2,51 @@
     --black: #11101D;
 }
 
+.d-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.justify-content-center {
+    justify-content: center;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.flex-start {
+    align-items: flex-start;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.mt-1 {
+    margin-top: 1rem;
+}
+
+.border {
+    border: 1px solid red;
+}
+
+/* color */
+.text-success {
+    color: green;
+}
+
+.text-danger {
+    color: red;
+}
+
 .flash-message {
-    position: absolute;
+    position: fixed;
     padding: 5px 10px;
     left: 50%;
     transform: translateX(-50%);
@@ -12,7 +55,8 @@
     color: white;
     z-index: 1999;
     animation-name: fadein;
-    animation-duration: 1s;
+    animation-duration: 3s;
+    transition-duration: 2s;
 }
 
 @keyframes fadein {

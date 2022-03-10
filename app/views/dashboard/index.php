@@ -7,7 +7,7 @@ if (!Session::has('authenticated')) {
   return redirect('../../index.php');
 }
 
-if (Session::get('nisn')) {
+if (Session::has('nisn')) {
   return redirect('history.php');
 } else {
   return redirect('pembayaran.php');

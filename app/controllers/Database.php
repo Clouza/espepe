@@ -14,6 +14,18 @@ if (isset($_POST['func'])) {
             $nisn = $_POST['ns'];
             Database::getDetailSiswaByNis($nisn);
             break;
+        case 'setStatusSiswa':
+            $db = new Database;
+            $nis = $_POST['ns'];
+            $checked = $_POST['ic'];
+            $db->setStatusSiswa($nis, $checked);
+            break;
+        case 'findPembayaranByTahun':
+            $db = new Database;
+            $idspp = $_POST['idspp'];
+            $tahun = $_POST['tahun'];
+            $db->findPembayaranByTahun($idspp, $tahun);
+            break;
         default:
             # code...
             break;
@@ -26,19 +38,23 @@ class Database
     private $username = 'root';
     private $password = '';
     private $database = 'db_spp';
-    public $conn;
+    private $conn;
 
     private
         // table function
         $table,
         // where function
         $where,
+        // and
+        $and,
         // join
         $join,
         // order by
         $orderBy,
         // limit
-        $limit;
+        $limit,
+        // search
+        $search;
 
     public function __construct()
     {
@@ -59,15 +75,6 @@ class Database
     {
         $this->table = $table;
         return $this;
-    }
-
-    public function assocRead($result)
-    {
-        $rows = [];
-        while ($row = $result->fetch_assoc()) {
-            $rows[] = $row;
-        }
-        return $rows;
     }
 
     public function where($field, ?string $operator = '=', $value)
@@ -95,6 +102,18 @@ class Database
         return $this;
     }
 
+    public function search($field, $like)
+    {
+        $this->search = "WHERE $field LIKE '%$like%'";
+        return $this;
+    }
+
+    public function and($and)
+    {
+        $this->and = "AND $and";
+        return $this;
+    }
+
     // will be active when have learned PDO
     // public function insert($data = [])
     // {
@@ -113,26 +132,43 @@ class Database
     public function get()
     {
         // standard query select
-        $sql = "SELECT * FROM $this->table $this->join $this->where $this->orderBy $this->limit";
+        $sql = "SELECT * FROM $this->table $this->join $this->where $this->orderBy $this->limit $this->search $this->and";
         $result = $this->conn->query($sql); // return object mysqli result
-        return $result;
+        if ($result) {
+            return $result;
+        } else {
+            return $this->conn->error;
+            die;
+        }
     }
 
     // ================================== Pembayaran
     public function payment($idpembayaran, $idpetugas, $nisn, $tglbayar, $bulan, $tahun, $idspp, $jumlah)
     {
+        $db = new Database;
+        // cek pembayaran ganda (tahun & bulan)
+        $tahunQuery = $db->table('pembayaran')->where('tahun_dibayar', '=', $tahun)->and("nisn = $nisn")->get();
+        $bulanQuery = $db->table('pembayaran')->where('bulan_dibayar', '=', $bulan)->and("nisn = $nisn")->get();
+
+        // tahun ganda
+        if ($tahunQuery->num_rows > 0 && $bulanQuery->num_rows > 0) {
+            return true;
+            die;
+        }
+
         $siswaIdSpp = $this->table('spp')->where('id_spp', '=', $idspp)->get()->fetch_assoc();
 
         $pembayaran = "INSERT INTO pembayaran VALUES ('$idpembayaran', '$idpetugas', '$nisn', '$tglbayar', '$bulan', '$tahun', '$idspp', '$jumlah')";
         $this->conn->query($pembayaran);
+        $nominal = (int)$siswaIdSpp['nominal'] - (int)$jumlah;
 
-        $nominal = (int)$siswaIdSpp['nominal'] + (int)$jumlah;
-
-        $updateTahunSpp = "UPDATE spp SET tahun = $tahun WHERE id_spp = $idspp";
-        $updateNominalSpp = "UPDATE spp SET nominal = $nominal WHERE id_spp = $idspp";
-
-        $this->conn->query($updateTahunSpp);
-        return $this->conn->query($updateNominalSpp);
+        // check if payment is made this year
+        if ($tahun == date('Y')) {
+            $updateTahunSpp = "UPDATE spp SET tahun = $tahun WHERE id_spp = $idspp";
+            $updateNominalSpp = "UPDATE spp SET nominal = $nominal WHERE id_spp = $idspp";
+            $this->conn->query($updateTahunSpp);
+            $this->conn->query($updateNominalSpp);
+        }
     }
 
     // ================================== Petugas
@@ -181,10 +217,10 @@ class Database
     }
 
     // ================================== Kelas
-    public function addKelas($nama, $kompetensi)
+    public function addKelas($nama, $kompetensi, $kelas, $harga)
     {
         try {
-            $query = "INSERT INTO $this->table VALUES ('', '$nama', '$kompetensi')";
+            $query = "INSERT INTO $this->table VALUES ('', '$nama', '$kompetensi', $kelas, $harga)";
             if (!$this->conn->query($query)) {
                 throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
             }
@@ -194,10 +230,10 @@ class Database
         }
     }
 
-    public function updateKelas($idkelas, $nama, $kompetensi)
+    public function updateKelas($idkelas, $nama, $kompetensi, $kelas, $harga)
     {
         try {
-            $query = "UPDATE kelas SET nama_kelas = '$nama', kompetensi_keahlian = '$kompetensi' WHERE id_kelas = '$idkelas'";
+            $query = "UPDATE kelas SET nama_kelas = '$nama', kompetensi_keahlian = '$kompetensi', kelas = '$kelas', harga = '$harga' WHERE id_kelas = '$idkelas'";
 
             if (!$this->conn->query($query)) {
                 throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
@@ -244,16 +280,31 @@ class Database
     {
         try {
             $db = new Database;
+
+            // update forein key in table siswa
             $getCurrentSPP = $db->table('spp')->orderBy('id_spp', 'DESC')->limit('1')->get()->fetch_assoc()['id_spp'];
             $query = "UPDATE siswa SET id_spp = '$getCurrentSPP' WHERE nis = '$nis'";
+            $this->conn->query($query);
 
-            if (!$this->conn->query($query)) {
+            $updateSPP = $this->setNominal();
+
+            if (!$this->conn->query($updateSPP)) {
                 throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
             }
         } catch (Exception $e) {
             echo $e->getMessage();
             die;
         }
+    }
+
+    private function setNominal()
+    {
+        $db = new Database;
+        // set default nominal
+        $nominal = $db->join('siswa', 'JOIN', 'spp', 'siswa.id_spp = spp.id_spp JOIN kelas ON siswa.id_kelas = kelas.id_kelas')->orderBy('nis', 'DESC')->limit('1')->get()->fetch_assoc();
+        $idspp = $nominal['id_spp'];
+        $harga = $nominal['harga'] * 12;
+        return "UPDATE spp SET nominal = '$harga' WHERE id_spp = '$idspp'";
     }
 
     public function updateSiswa($nisn, $nis, $email, $nama, $kelas, $alamat, $notelp)
@@ -310,7 +361,36 @@ class Database
         }
     }
 
-    // ================================== EMAIL
+    public function resetSPP($password, $level, $username)
+    {
+        // cek level
+        if ($level === '2') {
+            // cek username
+            $username = $this->table('petugas')->where('username', '=', $username)->get()->fetch_assoc();
+
+            // cek password
+            if ($username['password'] === $password) {
+                $db = new Database;
+                // get harga tiap siswa
+                $getHarga = $db->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas')->get();
+                $tahun = date('Y');
+
+                // set nominal in spp by harga * 12
+                foreach ($getHarga as $gh) {
+                    $idspp = $gh['id_spp'];
+                    $nominal = $gh['harga'] * 12;
+                    $updateSpp = "UPDATE spp SET tahun = '$tahun', nominal = '$nominal' WHERE id_spp = $idspp";
+                    $this->conn->query($updateSpp);
+                }
+
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    // ================================== EMAIL & TOKEN
     public function addToken($token, $email)
     {
         try {
@@ -326,17 +406,76 @@ class Database
         }
     }
 
+    public function deleteToken($idtoken)
+    {
+        try {
+            $query = "DELETE FROM token WHERE id_token = $idtoken";
+
+            if (!$this->conn->query($query)) {
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+    }
+
+    public function changepassword($email, $password)
+    {
+        try {
+            $db = new Database;
+            $nisn = $db->table('siswa')->where('email', '=', $email)->get()->fetch_assoc()['nisn'];
+            $query = "UPDATE siswa SET password = '$password' WHERE nisn = $nisn";
+
+            if (!$this->conn->query($query)) {
+                throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
+            }
+
+            return true;
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+    }
+
     // ================================== AJAX HANDLER
     public static function getDetailSiswaByNis($nisn)
     {
         $db = new Database;
-        // $result = $db->table('siswa')->where('nis', '=', $nis)->get()->fetch_assoc();
         $result = $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas')->where('nisn', '=', $nisn)->get()->fetch_assoc();
 
-        echo 'NIS: ' . $result['nis'] . '<br>';
-        echo 'NAMA: ' . $result['nama'] . '<br>';
-        echo 'NO TELP: ' . $result['no_telp'] . '<br>';
-        echo 'KELAS: ' . $result['nama_kelas'] . '<br>';
-        echo 'KOMPETENSI: ' . $result['kompetensi_keahlian'] . '<br>';
+        echo json_encode($result);
+    }
+
+    public function setStatusSiswa($nis, $checked)
+    {
+        $query = "UPDATE siswa SET is_deleted = '$checked' WHERE nis = '$nis'";
+        $this->conn->query($query);
+    }
+
+    public function findPembayaranByTahun($idspp, $tahun)
+    {
+        $db = new Database;
+        $pembayaran = $db->table('pembayaran')->where('id_spp', '=', $idspp)->and('tahun_dibayar = ' . $tahun)->get();
+        $list = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        $bulan = [];
+        foreach ($pembayaran as $p) {
+            array_push($bulan, ucwords($p['bulan_dibayar']));
+        }
+
+        $merge = array_merge($bulan, $list);
+        $cek = array_count_values($merge);
+
+        foreach ($merge as $p) {
+            if ($cek[$p] > 1) {
+                $dibayar[] = "<span class='text-success'>$p &#10003; </span>";
+            } else {
+                $dibayar[] = "<span class='text-danger'>$p &#10005; </span>";
+            }
+        }
+
+        $dibayar = array_slice($dibayar, count($bulan));
+        echo json_encode($dibayar);
     }
 }

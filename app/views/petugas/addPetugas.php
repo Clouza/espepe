@@ -9,6 +9,10 @@ if (!Session::has('authenticated')) {
     return redirect('../../index.php');
 }
 
+if (Session::get('level') != '2') {
+    return abort(404);
+}
+
 $otorisasi = Dashboard::getRole();
 
 if (isset($_POST['tambahPetugas'])) {
@@ -30,12 +34,8 @@ reqFile('../templates/sidebar.php');
 <section class="home-section">
     <div class="text">Tambah Petugas</div>
     <div class="container">
-        <a href="index.php">Kembali</a>
+        <a href="index.php"><button class="btn btn-action-back">&#8592; Kembali</button></a>
         <form action="" method="post" class="form-dashboard">
-            <!-- <div class="form-group">
-                <label for="idpetugas">Id Petugas</label>
-                <input type="number" name="idpetugas" id="idpetugas">
-            </div> -->
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" name="username" id="username" required>
@@ -43,7 +43,7 @@ reqFile('../templates/sidebar.php');
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="text" name="password" id="passwordfield" required>
-                <button type="button" class="btn" id="passgen">Generate Password</button>
+                <button type="button" class="btn btn-confirm" id="passgen">Generate Password</button>
             </div>
             <div class="form-group">
                 <label for="nama">Nama Petugas</label>
@@ -58,7 +58,7 @@ reqFile('../templates/sidebar.php');
                     <?php endforeach; ?>
                 </select>
             </div>
-            <button type="submit" class="btn" name="tambahPetugas">Tambah</button>
+            <button type="submit" class="btn btn-confirm" name="tambahPetugas">Tambah</button>
         </form>
     </div>
 </section>

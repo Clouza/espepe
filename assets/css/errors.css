@@ -1,0 +1,55 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+
+    /* color */
+    --primary: #11101D;
+    --secondary: #1d1b31;
+    --background: #E4E9F7;
+    --grey: #8d949a;
+    --grey-light: #edf1f4;
+}
+
+body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--background);
+}
+
+.message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.message h1 {
+    font-size: 6em;
+    font-weight: 100;
+}
+
+.number {
+    position: relative;
+    display: flex;
+}
+
+.number img {
+    position: absolute;
+    width: 9em;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.number h1 {
+    margin: 0 .5em;
+}
+
+.contact {
+    position: absolute;
+    bottom: 1rem;
+}
