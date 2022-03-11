@@ -43,8 +43,9 @@ class Database
     private
         // table function
         $table,
-        // where function
+        // where clause
         $where,
+        $multiplewhere,
         // and
         $and,
         // join
@@ -80,7 +81,12 @@ class Database
     public function where($field, ?string $operator = '=', $value)
     {
         $this->where = "WHERE $field $operator '$value'";
+        return $this;
+    }
 
+    public function multipleWhere($condition1, $condition2)
+    {
+        $this->multiplewhere = "WHERE ($condition1 AND $condition2)";
         return $this;
     }
 
@@ -132,7 +138,7 @@ class Database
     public function get()
     {
         // standard query select
-        $sql = "SELECT * FROM $this->table $this->join $this->where $this->orderBy $this->limit $this->search $this->and";
+        $sql = "SELECT * FROM $this->table $this->join $this->where $this->multiplewhere $this->orderBy $this->limit $this->search $this->and";
         $result = $this->conn->query($sql); // return object mysqli result
         if ($result) {
             return $result;
@@ -147,11 +153,9 @@ class Database
     {
         $db = new Database;
         // cek pembayaran ganda (tahun & bulan)
-        $tahunQuery = $db->table('pembayaran')->where('tahun_dibayar', '=', $tahun)->and("nisn = $nisn")->get();
-        $bulanQuery = $db->table('pembayaran')->where('bulan_dibayar', '=', $bulan)->and("nisn = $nisn")->get();
-
+        $duplicatedQuery = $db->table('pembayaran')->multipleWhere("bulan_dibayar = '$bulan'", "tahun_dibayar = '$tahun'")->and("nisn = '$nisn'")->get(); // "SELECT * FROM pembayaran WHERE (bulan_dibayar = '$bulan' AND tahun_dibayar = '$tahun') AND nisn = '$nisn'";
         // tahun ganda
-        if ($tahunQuery->num_rows > 0 && $bulanQuery->num_rows > 0) {
+        if ($duplicatedQuery->num_rows > 0) {
             return true;
             die;
         }
