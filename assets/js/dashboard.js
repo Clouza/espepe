@@ -109,6 +109,15 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // siswa password default
+  const newNis = document.querySelector('#newnis');
+  const newpasswordforsiswa = document.querySelector('#newpasswordforsiswa');
+
+  if (newNis != null) {
+    newNis.addEventListener('keyup', () => {
+      newpasswordforsiswa.setAttribute('value', `smkti@${newNis.value}.spp`) // smkti@nis.spp
+    });
+  }
   // ================================================
 
   // ajax mencari nis
@@ -213,6 +222,9 @@ window.addEventListener('DOMContentLoaded', () => {
   // cetak nota
   const cetakNotaBtn = document.querySelector('#cetakNota');
   const tableHistory = document.querySelector('#history');
+  const namaSiswa = document.querySelector('#namaSiswa');
+  const kelasSiswa = document.querySelector('#kelasSiswa');
+  const nisSiswa = document.querySelector('#nisSiswa');
 
   let now = new Date();
   const dd = now.getDate();
@@ -221,93 +233,40 @@ window.addEventListener('DOMContentLoaded', () => {
   const h = now.getHours();
   const m = now.getMinutes();
   const s = now.getSeconds();
-  now = `${dd} ${mm} ${yyyy} <br> (${h}:${m}:${s} WITA)`;
+  now = `${dd} ${mm} ${yyyy} <br> (${h}:${m}:${s})`;
 
   if (cetakNotaBtn != null) {
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/@page
+    // https://www.geeksforgeeks.org/how-to-remove-url-from-printing-the-page/
     cetakNotaBtn.addEventListener('click', () => {
       let th = window.open('', ''); // open new tab 
       th.document.write(`
       <html>
         <head>
-          <title>Cetak Nota!</title>
+          <title>Laporan Riwayat Pembayaran-NIS-${nisSiswa.innerHTML}</title>
           <style>
-            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-                font-family: 'Roboto', sans-serif;
-            }
-
-            body {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .header {
-                display: flex;
-                align-items: center;
-                padding: 0 2rem;
-                border: 1px solid black;
-                border-bottom: none;
-            }
-
-            .header img {
-                width: 6rem;
-                flex-grow: 1;
-
-            }
-
-            .header h1 {
-                flex-grow: 48;
-                text-align: center;
-            }
-
-            .header small {
-                flex-grow: 1;
-            }
-
-            /* table */
-            table {
-                border: 1px solid black;
-                border-top: none;
-                width: 100%;
-                border-spacing: 10px;
-                color: #11101D;
-            }
-
-            table td {
-                border-bottom: 1px solid white;
-                text-align: center;
-                padding: 10px;
-                border-spacing: 10px;
-                position: relative;
-                border-radius: 12px 12px 0 0;
-                box-shadow: 0 10px 10px rgba(255, 255, 255, 0.1);
-                text-transform: capitalize;
-            }
-
-            table td:after {
-                content: '';
-                position: absolute;
-                bottom: -2px;
-                left: 0;
-                width: 100%;
-                height: 2px;
-                z-index: 1;
-                background: #1d1b31;
-                transition-duration: .3s;
-                transition-timing-function: ease-out;
-                box-shadow: 0 10px 10px rgba(29, 27, 49, 0.2);
+            @import url('../../../assets/css/cetak.css');
+            @media print {
+              @page {
+                margin-top: 0;
+                margin-bottom: 0;
+              }
             }
           </style>
         </head>
         <body>
           <div class="header">
-            <img src="../../../assets/img/profile.png" alt="logo smk">
-            <h1>Nota</h1>
+            <img src="https://elearning.smkti-baliglobal.sch.id//img/logo-ti2.png" alt="logo smk">
+            <div class="header-info">
+              <h4>Sekolah Menengah Kejuruan Teknologi Informasi Bali Global</h4>
+              <h1>Smk TI Bali Global Denpasar</h1>
+              <p>JL. Tukad Citarum No.44 Denpasar, Telp. (0361) 249434, Fax. (0361) 248269</p>
+              <small>website : www.smkti-baliglobal.sch.id | email : admin@smkti-baliglobal.sch.id</small>
+            </div>
             <small>${now}</small>
           </div>
+          <span>${namaSiswa.innerHTML}</span>
+          <span>${kelasSiswa.innerHTML}</span>
           <table>
             ${tableHistory.innerHTML}
           </table>
@@ -318,7 +277,7 @@ window.addEventListener('DOMContentLoaded', () => {
       // wait until page loaded successfully
       setTimeout(() => {
         th.print()
-      }, 500) // .5s
+      }, 1000) // 1s
     });
   }
 
@@ -326,5 +285,18 @@ window.addEventListener('DOMContentLoaded', () => {
   const tglbayar = document.querySelector('#tglbayar');
   const today = new Date();
   const mmNum = monthListNumber[today.getMonth()];
-  tglbayar.value = `${yyyy}-${mmNum}-${dd}`;
+  if (tglbayar != null) {
+    tglbayar.value = `${yyyy}-${mmNum}-${dd}`;
+  }
 })
+
+// mobile
+const mobileSearchBtn = document.querySelector('#mobileSearchBtn');
+const formSearchMobile = document.querySelector('#formSearchMobile');
+
+if (mobileSearchBtn != null) {
+  mobileSearchBtn.addEventListener('click', () => {
+    console.log(formSearchMobile.getAttribute('style'));
+    formSearchMobile.classList.toggle('formvisible');
+  });
+}

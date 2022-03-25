@@ -269,29 +269,19 @@ class Database
     public function addSiswa($nisn, $nis, $email, $password, $nama, $idkelas, $alamat, $notelp)
     {
         try {
-            $query = "INSERT INTO $this->table VALUES ('$nisn', '$nis', '$email', '$password', '$nama', '$idkelas', '$alamat', '$notelp', '', '')";
+            $db = new Database;
+            $idspp = $db->table('spp')->orderBy('id_spp', 'DESC')->limit('1')->get()->fetch_assoc()['id_spp'];
+            $query = "INSERT INTO $this->table VALUES ('$nisn', '$nis', '$email', '$password', '$nama', '$idkelas', '$alamat', '$notelp', '$idspp', '')";
 
+            // add new row in table siswa
             if (!$this->conn->query($query)) {
                 throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
             }
-        } catch (Exception $e) {
-            echo $e->getMessage();
-            die;
-        }
-    }
 
-    public function updateSiswaWithSpp($nis)
-    {
-        try {
-            $db = new Database;
-
-            // update forein key in table siswa
-            $getCurrentSPP = $db->table('spp')->orderBy('id_spp', 'DESC')->limit('1')->get()->fetch_assoc()['id_spp'];
-            $query = "UPDATE siswa SET id_spp = '$getCurrentSPP' WHERE nis = '$nis'";
-            $this->conn->query($query);
-
+            // set nominal
             $updateSPP = $this->setNominal();
 
+            // execute query
             if (!$this->conn->query($updateSPP)) {
                 throw new Exception("Something went wrong at (" . __METHOD__ . ') <hr>' .  $this->conn->error, 1);
             }
@@ -429,6 +419,9 @@ class Database
         try {
             $db = new Database;
             $nisn = $db->table('siswa')->where('email', '=', $email)->get()->fetch_assoc()['nisn'];
+
+            // hash password
+            $password = password_hash($password, PASSWORD_DEFAULT);
             $query = "UPDATE siswa SET password = '$password' WHERE nisn = $nisn";
 
             if (!$this->conn->query($query)) {

@@ -549,8 +549,115 @@ fieldset legend {
   border-radius: 50%;
 }
 
+/* mobile navbar */
+.mobile-navbar {
+  position: fixed;
+  display: none;
+  justify-content: center;
+  width: 100vw;
+  height: 60px;
+  background-color: var(--primary);
+  bottom: 0;
+  z-index: 1000;
+}
+
+.mobile-navbar .main-menu {
+  display: flex;
+  align-items: center;
+}
+
+.mobile-navbar .main-menu a {
+  color: var(--background);
+  font-size: 18px;
+  padding: 0 1rem;
+}
+
+.mobile-navbar .main-menu a:hover {
+  color: white;
+}
+
+.mobile-navbar .mobile-search {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  top: -7.5rem;
+}
+
+.mobile-navbar .mobile-search i {
+  color: var(--primary);
+  background-color: white;
+  font-size: 20px;
+  padding: 1rem 1rem;
+  border-radius: 100px;
+  margin: 1rem 0;
+  cursor: pointer;
+}
+
+.mobile-navbar .mobile-search form {
+  background-color: white;
+  border-radius: 10px;
+  width: 96vw;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  box-shadow: 2px 2px 22px 2px rgba(0, 0, 0, 0.15);
+
+}
+
+.mobile-navbar .mobile-search form input {
+  padding: 8px 10px;
+  outline: none;
+  border: none;
+  border-radius: 6px 0 0 6px;
+  background-color: rgba(204, 204, 204, 0.220);
+}
+
+.mobile-navbar .mobile-search form button {
+  position: relative;
+  padding: 5px 10px;
+  border-radius: 0 4px 4px 0;
+  border: none;
+  cursor: pointer;
+  background-color: var(--secondary);
+  color: white;
+}
+
+.formvisible {
+  visibility: hidden;
+}
+
+.mobile-active i {
+  color: white;
+}
+
+.mobile-logout button {
+  border: none;
+  background-color: white;
+  color: var(--primary);
+  font-size: 18px;
+  padding: .6rem 1rem;
+  border-radius: 6px;
+}
+
 @media (max-width: 420px) {
   .sidebar li .tooltip {
     display: none;
+  }
+
+  /* https://dribbble.com/tags/mobile_navigation */
+  /* https://dribbble.com/tags/navigation_bar */
+
+  /* mobile navbar */
+  .sidebar {
+    display: none;
+  }
+
+  .home-section {
+    padding: 0 0 60px 0;
+  }
+
+  .mobile-navbar {
+    display: flex;
   }
 }

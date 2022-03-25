@@ -46,18 +46,15 @@ class Dashboard
     public static function getHistory($nisn)
     {
         $db = new Database;
-        return $db->table('pembayaran')->join('pembayaran', 'JOIN', 'petugas', 'pembayaran.id_petugas = petugas.id_petugas')->where('nisn', '=', $nisn)->orderBy('tgl_bayar', 'DESC')->get();
+        return $db->table('pembayaran')->join('pembayaran', 'JOIN', 'petugas', 'pembayaran.id_petugas = petugas.id_petugas')->where('nisn', '=', $nisn)->orderBy('tahun_dibayar', 'DESC')->get();
     }
 
     public static function findSiswaByNis($nis)
     {
         $db = new Database;
         try {
-            $siswa = $db->table('siswa')->where('nis', '=', $nis)->get()->fetch_assoc();
-            if (is_null($siswa)) {
-                throw new Exception("Siswa tidak ada", 404);
-            }
-            return (int)$siswa['nisn'];
+            $siswa = $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas')->where('nis', '=', $nis)->get()->fetch_assoc(); // array or null
+            return $siswa;
         } catch (Exception $e) {
             return $e->getMessage();
         }
@@ -152,15 +149,11 @@ class Dashboard
     {
         $db = new Database;
 
-        // add siswa
-        $db->table('siswa')->addSiswa($nisn, $nis, $email, $password, $nama, $idkelas, $alamat, $notelp);
-
         // create new row in table spp
         $db->table('spp')->addSpp();
 
-        // update new row in table siswa according with table spp
-        $foreign = $db->table('siswa')->where('nis', '=', $nis)->get()->fetch_assoc()['nis'];
-        return $db->updateSiswaWithSpp($foreign);
+        // add siswa
+        $db->table('siswa')->addSiswa($nisn, $nis, $email, $password, $nama, $idkelas, $alamat, $notelp);
     }
 
     public static function updateSiswa($nisn, $nis, $email, $nama, $kelas, $alamat, $notelp)

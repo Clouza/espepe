@@ -9,6 +9,10 @@ if (Session::has('authenticated')) {
     return redirect('app/views/dashboard.php');
 }
 
+if (isset($_GET['changed'])) {
+    Flash::set('Password berhasil diubah! Silahkan login');
+}
+
 // check email & password
 Auth::checkLog($_POST);
 ?>

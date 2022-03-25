@@ -17,7 +17,7 @@ if (isset($_GET['token'])) {
     if (!is_null($tokenInDatabase)) {
         $expiredTime = $tokenInDatabase['time'];
         // check if token expired
-        if (time() - $expiredTime < (60 * 60 * 24)) { // sehari
+        if (time() - $expiredTime < (60 * 60 * 24 * 1)) { // sehari
             // change password
             if (isset($_POST['change'])) {
                 $email = $tokenInDatabase['email'];
@@ -28,14 +28,16 @@ if (isset($_GET['token'])) {
                     // delete token in database
                     $db->deleteToken($tokenInDatabase['id_token']);
 
-                    Flasher::set('Password berhasil diubah! Silahkan login.');
+                    // redirect to login
+                    return redirect('../../../index.php?changed');
                 }
             }
         } else {
-            Flasher::set('Token kedaluarsa & akan dihapus');
-
             // delete token in database
             $db->deleteToken($tokenInDatabase['id_token']);
+
+            // redirect to forgot
+            return redirect('forgot.php?exp=true');
         }
     } else {
         return abort(404);

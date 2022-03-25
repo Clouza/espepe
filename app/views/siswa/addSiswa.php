@@ -46,7 +46,7 @@ reqFile('../templates/sidebar.php');
             </div>
             <div class="form-group">
                 <label for="nis">NIS</label>
-                <input type="number" min="" name="nis" id="nis" required>
+                <input type="number" min="" name="nis" id="newnis" required>
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
@@ -54,7 +54,7 @@ reqFile('../templates/sidebar.php');
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password" required>
+                <input type="password" name="password" id="newpasswordforsiswa" readonly required>
             </div>
             <div class="form-group">
                 <label for="nama">Nama</label>

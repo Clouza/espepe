@@ -9,7 +9,7 @@ if (isset($_POST['logout'])) {
 ?>
 
 <body>
-    <!-- https://dribbble.com/tags/navigation_bar -->
+    <!-- pc navbar -->
     <div class="sidebar">
         <div class="logo-details">
             <div class="logo-name">ESPEPE</div>
@@ -108,4 +108,44 @@ if (isset($_POST['logout'])) {
                 </form>
             </li>
         </ul>
+    </div>
+
+    <!-- mobile navbar -->
+    <div class="mobile-navbar">
+        <div class="main-menu">
+            <?php if (Session::get('level') == 2) : ?>
+                <a href="../kelas/index.php" class="<?= (currentApp() == 'kelas/index' || currentApp() == 'kelas/addKelas' || currentApp() == 'kelas/updateKelas' ? 'mobile-active' : '') ?>">
+                    <i class='bx bxs-book'></i>
+                </a>
+                <a href="../siswa/index.php" class="<?= (currentApp() == 'siswa/index' || currentApp() == 'siswa/addSiswa' || currentApp() == 'siswa/updateSiswa' ? 'mobile-active' : '') ?>">
+                    <i class='bx bxs-graduation'></i>
+                </a>
+                <a href="../spp/index.php" class="<?= (currentApp() == 'spp/index' || currentApp() == 'spp/detailspp' ? 'mobile-active' : '') ?>">
+                    <i class='bx bxs-donate-heart'></i>
+                </a>
+                <a href="../petugas/index.php" class="<?= (currentApp() == 'petugas/index' || currentApp() == 'petugas/addPetugas' || currentApp() == 'petugas/updatePetugas' ? 'mobile-active' : '') ?>">
+                    <i class='bx bx-user'></i>
+                </a>
+            <?php endif; ?>
+            <?php if (Session::has('level')) : ?>
+                <a href="../dashboard/pembayaran.php" class="<?= (currentApp() == 'dashboard/pembayaran' ? 'mobile-active' : '') ?>">
+                    <i class='bx bxs-bank'></i>
+                </a>
+            <?php endif; ?>
+            <a href="../dashboard/history.php" class="<?= (currentApp() == 'dashboard/history' ? 'mobile-active' : '') ?>">
+                <i class='bx bx-history'></i>
+            </a>
+            <form action="" method="post" class="mobile-logout">
+                <button type="submit" name="logout"><i class='bx bx-log-out'></i></button>
+            </form>
+        </div>
+        <?php if (Session::get('level') == 2) : ?>
+            <div class="mobile-search">
+                <form class="formvisible" action="../dashboard/search.php" post="GET" id="formSearchMobile">
+                    <input type="text" name="q" placeholder="Cari Nama Siswa">
+                    <button type="submit">Cari</button>
+                </form>
+                <i class='bx bx-search' id="mobileSearchBtn"></i>
+            </div>
+        <?php endif; ?>
     </div>

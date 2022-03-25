@@ -16,6 +16,10 @@ if (isset($_POST['sendtoken'])) {
         Flasher::set('Token gagal dikirim! Email tidak ada.');
     }
 }
+
+if (isset($_GET['exp']) && $_GET['exp'] == 'true') {
+    Flasher::set('Token kedaluarsa');
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,7 +41,7 @@ if (isset($_POST['sendtoken'])) {
 </head>
 
 <body>
-    <form action="" method="post">
+    <form action="forgot.php" method="post">
         <div class="form-group">
             <label for="email">Email</label>
             <input type="email" name="email" id="email" required tabindex="1">

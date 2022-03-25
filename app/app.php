@@ -85,3 +85,14 @@ function abort($number)
             break;
     }
 }
+
+// password hash & verify
+function passhash($password, $algo = PASSWORD_DEFAULT)
+{
+    return password_hash($password, $algo);
+}
+
+function passcheck($userpassword, $realpassword)
+{
+    return password_verify($userpassword, $realpassword);
+}

@@ -54,8 +54,9 @@ class AuthenticationController
             // check if user login with nis
             $nisCheck = $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas')->where('nis', '=', $user)->get();
             if ($nisCheck->num_rows > 0) {
+                // check password
                 $match = $db->table('siswa')->where('password', '=', $password)->get();
-                if ($match->num_rows > 0) {
+                if ($match->num_rows > 0) { // before hashing
                     $match = $match->fetch_assoc();
                     Session::set('authenticated', $user);
                     Session::set('profile', $match['nama']);
@@ -63,8 +64,20 @@ class AuthenticationController
                     Session::set('nisn', $match['nisn']);
                     Session::set('nis', $match['nis']);
                     return redirect('app/views/dashboard/index.php');
-                } else {
-                    return Flash::set('NIS salah atau Password salah');
+                } else { // after hashing
+                    $nisCheck = $nisCheck->fetch_assoc();
+                    $password = passcheck($password, $nisCheck['password']); // true
+                    if ($password) { // password match
+                        $match = $nisCheck;
+                        Session::set('authenticated', $user);
+                        Session::set('profile', $match['nama']);
+                        Session::set('kelas', $match['nama_kelas']);
+                        Session::set('nisn', $match['nisn']);
+                        Session::set('nis', $match['nis']);
+                        return redirect('app/views/dashboard/index.php');
+                    } else {
+                        return Flash::set('NIS salah atau Password salah');
+                    }
                 }
             }
 
