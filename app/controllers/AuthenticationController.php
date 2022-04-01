@@ -37,8 +37,9 @@ class AuthenticationController
             // check if user login with email
             $emailCheck = $db->table('siswa')->join('siswa', 'JOIN', 'kelas', 'siswa.id_kelas = kelas.id_kelas')->where('email', '=', $user)->get();
             if ($emailCheck->num_rows > 0) {
+                // check password
                 $match = $db->table('siswa')->where('password', '=', $password)->get();
-                if ($match->num_rows > 0) {
+                if ($match->num_rows > 0) { // before hashing
                     $match = $match->fetch_assoc();
                     Session::set('authenticated', $user);
                     Session::set('profile', $match['nama']);
@@ -46,8 +47,20 @@ class AuthenticationController
                     Session::set('nisn', $match['nisn']);
                     Session::set('nis', $match['nis']);
                     return redirect('app/views/dashboard/index.php');
-                } else {
-                    return Flash::set('Email atau Password salah');
+                } else { // after hashing
+                    $emailCheck = $emailCheck->fetch_assoc();
+                    $password = passcheck($password, $emailCheck['password']); // true
+                    if ($password) { // password match
+                        $match = $emailCheck;
+                        Session::set('authenticated', $user);
+                        Session::set('profile', $match['nama']);
+                        Session::set('kelas', $match['nama_kelas']);
+                        Session::set('nisn', $match['nisn']);
+                        Session::set('nis', $match['nis']);
+                        return redirect('app/views/dashboard/index.php');
+                    } else {
+                        return Flash::set('NIS salah atau Password salah');
+                    }
                 }
             }
 
