@@ -13,6 +13,7 @@ if (!Session::has('level')) {
     return abort(404);
 }
 
+// masukin ke database
 if (isset($_POST['payday'])) {
     $idpetugas = Session::get('idpetugas');
     $nis = $_POST['nis'];
@@ -34,11 +35,7 @@ reqFile('../templates/sidebar.php');
     <div class="text">Pembayaran</div>
     <div class="container">
         <form action="" method="post" class="form-dashboard">
-            <div class="form-group">
-                <label for="idpembayaran">ID Pembayaran</label>
-                <input type="text" name="idpembayaran" id="idpembayaran" disabled value="" placeholder="Terisi otomatis">
-            </div>
-
+            <input type="hidden" id="petugas" value="<?= Session::get('profile'); ?>">
             <div class="form-group">
                 <label for="nisn">Nis</label>
                 <select name="nis" id="nis" required>
@@ -52,13 +49,12 @@ reqFile('../templates/sidebar.php');
 
             <div class="form-group">
                 <label for="tglbayar">Tanggal Bayar (Hari ini)</label>
-                <input type="date" name="tglbayar" id="tglbayar" value="" readonly required>
+                <input type="date" name="tglbayar" id="tglbayar" value="" required>
             </div>
 
             <div class="form-group">
                 <label for="bulan">Bulan dibayar</label>
-                <select name="bulan" id="bulan" required>
-                    <option value="" selected disabled>-- Pilih Bulan --</option>
+                <select name="bulan" id="currentBulan" required>
                     <option value="januari">Januari</option>
                     <option value="februari">Februari</option>
                     <option value="maret">Maret</option>
@@ -76,8 +72,7 @@ reqFile('../templates/sidebar.php');
 
             <div class="form-group">
                 <label for="tahun">Tahun dibayar</label>
-                <!-- <input type="text" name="tahun" id="tahun" readonly value="<?= date('Y'); ?>"> -->
-                <select name="tahun" id="tahun">
+                <select name="tahun" id="currentYear">
                     <?php for ($i = (int)date('Y'); $i > (int)date('Y') - 3; $i--) : ?>
                         <option value="<?= $i; ?>"><?= $i; ?></option>
                     <?php endfor; ?>
@@ -85,16 +80,11 @@ reqFile('../templates/sidebar.php');
             </div>
 
             <div class="form-group">
-                <label for="idspp">ID Spp</label>
-                <input type="text" name="idspp" id="idspp" disabled placeholder="Terisi otomatis sesuai NIS">
-            </div>
-
-            <div class="form-group">
                 <label for="jumlahbayar">Jumlah Bayar (Rupiah)</label>
                 <input type="number" name="jumlahbayar" id="jumlahbayar" min="0" placeholder="Terisi otomatis sesuai kelas" readonly required>
             </div>
 
-            <button type="submit" class="btn btn-confirm" name="payday">Input data</button>
+            <button type="submit" class="btn btn-confirm" name="payday" id="currentPayment">Input data</button>
 
         </form>
     </div>

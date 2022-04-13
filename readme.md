@@ -1,5 +1,5 @@
 ## About This Project
-This project is personal. And also made from scratch without a framework. Maintenance will be carried out every day until this project becomes an open source project.
+This project is personal. And also made from scratch without a framework. Maintenance will be carried out every day until this project becomes an open source project. (v.1.4.2-stable)
 
 ## Feature Available
 - Multiple Authentication

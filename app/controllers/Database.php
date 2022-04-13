@@ -6,6 +6,8 @@ use PDO;
 use mysqli;
 use Exception;
 
+use App\Controllers\Dashboard;
+
 // ajax handler
 if (isset($_POST['func'])) {
     $functionRequest = $_POST['func'];
@@ -25,6 +27,11 @@ if (isset($_POST['func'])) {
             $idspp = $_POST['idspp'];
             $tahun = $_POST['tahun'];
             $db->findPembayaranByTahun($idspp, $tahun);
+            break;
+        case 'compareMonthByNis':
+            $db = new Database;
+            $nisn = $_POST['ns'];
+            $db->compareMonthByNis($nisn);
             break;
         default:
             # code...
@@ -473,6 +480,47 @@ class Database
         }
 
         $dibayar = array_slice($dibayar, count($bulan));
+        echo json_encode($dibayar);
+    }
+
+
+    private function readBulanByPembayaran($idspp, $tahun)
+    {
+        $db = new Database;
+        $pembayaran = $db->table('pembayaran')->where('id_spp', '=', $idspp)->and('tahun_dibayar = ' . $tahun)->get();
+
+        $bulan = [];
+        foreach ($pembayaran as $p) {
+            // $bulan[] .= ucwords($p['bulan_dibayar']);
+            array_push($bulan, ucwords($p['bulan_dibayar']));
+        }
+        return $bulan;
+    }
+
+    private function readDetailSPPWithDetailSiswa($nisn)
+    {
+        $db = new Database;
+        return $db->table('spp')->join('spp', 'JOIN', 'siswa', 'spp.id_spp = siswa.id_spp JOIN kelas ON kelas.id_kelas = siswa.id_kelas')->where('nisn', '=', $nisn)->get()->fetch_assoc();
+    }
+
+    public function compareMonthByNis($nisn)
+    {
+        $spp = $this->readDetailSPPWithDetailSiswa($nisn);
+        $pembayaran = $this->readBulanByPembayaran($spp['id_spp'], date('Y'));
+        $bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        $merge = array_merge($pembayaran, $bulan);
+        $cek = array_count_values($merge);
+
+        foreach ($merge as $p) {
+            if ($cek[$p] > 1) { // belum dibayar
+                $dibayar[] = "<option value=" . strtolower($p) . " style='visibility:hidden;' disabled>$p </option>";
+            } else { // sudah dibayar
+                $dibayar[] = "<option value=" . strtolower($p) . ">$p</option>";
+            }
+        }
+
+        $dibayar = array_slice($dibayar, count($pembayaran));
         echo json_encode($dibayar);
     }
 }

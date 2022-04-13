@@ -124,6 +124,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const nis = document.querySelector('#nis');
   const information = document.querySelector('#information');
   const jumlahbayar = document.querySelector('#jumlahbayar');
+  const currentBulan = document.querySelector('#currentBulan');
+
+
   if (nis != null) {
     nis.addEventListener('change', (e) => {
       let xhr = new XMLHttpRequest();
@@ -139,11 +142,11 @@ window.addEventListener('DOMContentLoaded', () => {
           information.innerHTML = `
         <fieldset>
           <legend>Data Siswa</legend>
-          NIS: ${response.nis} <br>
-          NAMA: ${response.nama} <br>
-          NO TELP: ${response.no_telp} <br>
-          KELAS: ${response.nama_kelas} <br>
-          KOMPETENSI: ${response.kompetensi_keahlian} <br>
+          <p id="currentNIS">NIS: ${response.nis} </p>
+          <p id="currentName">NAMA: ${response.nama} </p>
+          <p>NO TELP: ${response.no_telp}</p>
+          <p id="currentClass">KELAS: ${response.nama_kelas}</p>
+          <p>KOMPETENSI: ${response.kompetensi_keahlian}</p>
 
           HARGA DITENTUKAN: Rp${response.harga}
         </fieldset>
@@ -154,7 +157,36 @@ window.addEventListener('DOMContentLoaded', () => {
 
       // execute
       xhr.send(params);
+
+      // close connection
+      // xhr.abort();
+
+      // new xml request
+      let xhrMonth = new XMLHttpRequest();
+      let urlMonth = '../../controllers/Database.php';
+      let paramsMonth = `ns=${e.target.value}&func=compareMonthByNis`; // ns = nis, func = function
+
+      xhrMonth.open('POST', urlMonth, true);
+      xhrMonth.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+      xhrMonth.onreadystatechange = () => {
+        if (xhrMonth.readyState == 4 && xhrMonth.status == 200) {
+          const responseMonth = JSON.parse(xhrMonth.response);
+          let child = '';
+          responseMonth.forEach((v, i) => {
+            child += v;
+          });
+          currentBulan.innerHTML = child;
+        }
+      }
+
+      // execute Month
+      xhrMonth.send(paramsMonth);
+      // xhrMonth.abort();
     })
+
+    // additional ajax (set month)
+
   }
 
   // ajax status siswa
@@ -288,7 +320,72 @@ window.addEventListener('DOMContentLoaded', () => {
   if (tglbayar != null) {
     tglbayar.value = `${yyyy}-${mmNum}-${dd}`;
   }
-})
+
+  // cetak current payment
+  const currentPayment = document.querySelector('#currentPayment');
+  const currentYear = document.querySelector('#currentYear');
+
+  if (currentPayment != null) {
+    currentPayment.addEventListener('click', (e) => {
+      const petugas = document.querySelector('#petugas');
+      const currentName = document.querySelector('#currentName');
+      const currentClass = document.querySelector('#currentClass');
+
+      let currentNIS = document.querySelector('#currentNIS');
+      currentNIS = currentNIS.innerHTML.split(':')[1];
+
+      let th = window.open('', ''); // open new tab 
+      th.document.write(`
+      <html>
+      <head>
+        <title>Pembayaran-NIS-${currentNIS}</title>
+        <style>
+          @import url('../../../assets/css/cetak.css');
+          @media print {
+            @page {
+              margin-top: 0;
+              margin-bottom: 0;
+            }
+          }
+        </style>
+      </head>
+        <body>
+          <div class="header">
+            <img src="https://elearning.smkti-baliglobal.sch.id//img/logo-ti2.png" alt="logo smk">
+            <div class="header-info">
+              <h4>Sekolah Menengah Kejuruan Teknologi Informasi Bali Global</h4>
+              <h1>Smk TI Bali Global Denpasar</h1>
+              <p>JL. Tukad Citarum No.44 Denpasar, Telp. (0361) 249434, Fax. (0361) 248269</p>
+              <small>website : www.smkti-baliglobal.sch.id | email : admin@smkti-baliglobal.sch.id</small>
+            </div>
+            <small>${now}</small>
+          </div>
+          <span>${currentName.innerHTML}</span>
+          <span>${currentClass.innerHTML}</span>
+          <table>
+                <tr>
+                  <th>Petugas</th>
+                  <th>Tanggal</th>
+                  <th>Bulan</th>
+                  <th>Tahun</th>
+                  <th>Jumlah</th>
+                </tr>
+                <tr>
+                  <td>${petugas.value}</td>
+                  <td>${tglbayar.value}</td>
+                  <td>${currentBulan.value}</td>
+                  <td>${currentYear.value}</td>
+                  <td>${jumlahbayar.value}</td>
+                </tr>
+          </table>
+        </body>
+      </html>
+      `); // write something in new tab
+      th.document.close();
+      th.print();
+    });
+  }
+}) // load js
 
 // mobile
 const mobileSearchBtn = document.querySelector('#mobileSearchBtn');

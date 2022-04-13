@@ -16,6 +16,8 @@ if (!$_GET['ns']) {
     return abort(404);
 }
 
+
+// membandingkan bulan 
 $spp = Dashboard::readDetailSPPWithDetailSiswa($_GET['ns']);
 $pembayaran = Dashboard::readBulanByPembayaran($spp['id_spp'], date('Y'));
 $bulan = Dashboard::$bulan;
