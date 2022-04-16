@@ -1,6 +1,9 @@
 ## About This Project
 This project is personal. And also made from scratch without a framework. Maintenance will be carried out every day until this project becomes an open source project. (v.1.4.2-stable)
 
+### Maintenance
+Maintenance will continue until may 2022. After that this project will be officially completed.
+
 ## Feature Available
 - Multiple Authentication
     - *Siswa* (Student)
